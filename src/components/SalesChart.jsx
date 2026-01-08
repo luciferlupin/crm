@@ -1,15 +1,120 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { salesService } from '../services/salesService.js'
+import { leadService } from '../services/leadService.js'
 
 const SalesChart = () => {
-  const data = [
-    { month: 'Jan', sales: 4000, leads: 240 },
-    { month: 'Feb', sales: 3000, leads: 139 },
-    { month: 'Mar', sales: 5000, leads: 380 },
-    { month: 'Apr', sales: 4780, leads: 390 },
-    { month: 'May', sales: 5890, leads: 480 },
-    { month: 'Jun', sales: 6390, leads: 520 },
-  ]
+  const [data, setData] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchChartData()
+  }, [])
+
+  const fetchChartData = async () => {
+    try {
+      setLoading(true)
+      
+      // Fetch real sales and leads data
+      const [sales, leads] = await Promise.all([
+        salesService.fetchSales(),
+        leadService.fetchLeads()
+      ])
+      
+      // Group data by month
+      const monthlyData = {}
+      
+      // Process sales data
+      sales.forEach(sale => {
+        if (sale.date) {
+          const date = new Date(sale.date)
+          const monthKey = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+          
+          if (!monthlyData[monthKey]) {
+            monthlyData[monthKey] = {
+              month: date.toLocaleDateString('en-US', { month: 'short' }),
+              sales: 0,
+              leads: 0,
+              fullMonth: monthKey
+            }
+          }
+          
+          monthlyData[monthKey].sales += parseFloat(sale.amount) || 0
+        }
+      })
+      
+      // Process leads data
+      leads.forEach(lead => {
+        if (lead.created_at) {
+          const date = new Date(lead.created_at)
+          const monthKey = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+          
+          if (!monthlyData[monthKey]) {
+            monthlyData[monthKey] = {
+              month: date.toLocaleDateString('en-US', { month: 'short' }),
+              sales: 0,
+              leads: 0,
+              fullMonth: monthKey
+            }
+          }
+          
+          monthlyData[monthKey].leads += 1
+        }
+      })
+      
+      // Convert to array and sort by date
+      const sortedData = Object.values(monthlyData)
+        .sort((a, b) => new Date(a.fullMonth) - new Date(b.fullMonth))
+        .slice(-6) // Show last 6 months
+        .map(item => ({
+          month: item.month,
+          sales: Math.round(item.sales),
+          leads: item.leads
+        }))
+      
+      // If no data, show empty chart with current months
+      if (sortedData.length === 0) {
+        const currentMonth = new Date()
+        const months = []
+        for (let i = 5; i >= 0; i--) {
+          const month = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - i, 1)
+          months.push({
+            month: month.toLocaleDateString('en-US', { month: 'short' }),
+            sales: 0,
+            leads: 0
+          })
+        }
+        setData(months)
+      } else {
+        setData(sortedData)
+      }
+      
+    } catch (error) {
+      console.error('Error fetching chart data:', error)
+      // Show empty chart on error
+      const currentMonth = new Date()
+      const months = []
+      for (let i = 5; i >= 0; i--) {
+        const month = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - i, 1)
+        months.push({
+          month: month.toLocaleDateString('en-US', { month: 'short' }),
+          sales: 0,
+          leads: 0
+        })
+      }
+      setData(months)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="h-80 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+      </div>
+    )
+  }
 
   return (
     <div className="h-80">
