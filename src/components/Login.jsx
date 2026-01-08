@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext.jsx'
-import { Eye, EyeOff, Mail, Lock, User, Building } from 'lucide-react'
+import { testSupabaseConnection } from '../config/supabase.js'
+import { Eye, EyeOff, Mail, Lock, User, Building, AlertCircle } from 'lucide-react'
 
 const Login = () => {
   const [isSignup, setIsSignup] = useState(false)
@@ -14,8 +15,29 @@ const Login = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
+  const [connectionStatus, setConnectionStatus] = useState('checking')
   
   const { login, signup } = useAuth()
+
+  useEffect(() => {
+    // Test Supabase connection on component mount
+    const checkConnection = async () => {
+      try {
+        const result = await testSupabaseConnection()
+        if (result.connected) {
+          setConnectionStatus('connected')
+        } else {
+          setConnectionStatus('error')
+          console.error('Supabase connection failed:', result.error)
+        }
+      } catch (err) {
+        setConnectionStatus('error')
+        console.error('Connection test error:', err)
+      }
+    }
+    
+    checkConnection()
+  }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -24,6 +46,8 @@ const Login = () => {
     setMessage('')
 
     try {
+      console.log('Form submitted:', { isSignup, email })
+
       if (isSignup) {
         // Validate passwords match for signup
         if (password !== confirmPassword) {
@@ -42,25 +66,53 @@ const Login = () => {
           role: 'business_owner'
         }
 
+        console.log('Attempting signup with metadata:', metadata)
         const result = await signup(email, password, metadata)
+        console.log('Signup result:', result)
         
-        if (result.user && !result.session) {
-          setMessage('Signup successful! Please check your email to verify your account.')
-          // Reset form
+        // Check if user is now logged in
+        if (result.session || result.user) {
+          setMessage('Account created successfully! Redirecting to dashboard...')
+          
+          // Clear form immediately
           setEmail('')
           setPassword('')
           setConfirmPassword('')
           setFullName('')
           setCompany('')
-        } else if (result.session) {
-          // User is automatically logged in
-          setMessage('Signup successful! Welcome to CRM Dashboard.')
+          
+          // Wait a moment for the auth state to update, then let the App handle redirect
+          setTimeout(() => {
+            setMessage('')
+          }, 2000)
+        } else {
+          setMessage('Account created! Please try logging in.')
+          // Switch to login mode
+          setTimeout(() => {
+            setIsSignup(false)
+            setMessage('')
+          }, 2000)
         }
       } else {
-        await login(email, password)
+        console.log('Attempting login...')
+        const result = await login(email, password)
+        console.log('Login result:', result)
       }
     } catch (error) {
-      setError(error.message || (isSignup ? 'Signup failed' : 'Login failed'))
+      console.error('Authentication error:', error)
+      
+      // More specific error messages
+      if (error.message?.includes('Invalid login credentials')) {
+        setError('Invalid email or password. Please check your credentials and try again.')
+      } else if (error.message?.includes('Email not confirmed')) {
+        setError('Email verification required. Please check your email or contact support.')
+      } else if (error.message?.includes('User not found')) {
+        setError('No account found with this email address. Please sign up first.')
+      } else if (error.message?.includes('User already registered')) {
+        setError('An account with this email already exists. Please try logging in.')
+      } else {
+        setError(error.message || (isSignup ? 'Signup failed' : 'Login failed'))
+      }
     } finally {
       setLoading(false)
     }
@@ -93,6 +145,28 @@ const Login = () => {
               : 'Enter your credentials to access the dashboard'
             }
           </p>
+          
+          {/* Connection Status Indicator */}
+          <div className="mt-4 flex justify-center">
+            {connectionStatus === 'checking' && (
+              <div className="flex items-center text-yellow-600 text-sm">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-600 mr-2"></div>
+                Checking connection...
+              </div>
+            )}
+            {connectionStatus === 'connected' && (
+              <div className="flex items-center text-green-600 text-sm">
+                <div className="h-2 w-2 bg-green-600 rounded-full mr-2"></div>
+                Connected to Supabase
+              </div>
+            )}
+            {connectionStatus === 'error' && (
+              <div className="flex items-center text-red-600 text-sm">
+                <AlertCircle className="h-4 w-4 mr-2" />
+                Connection error - check console
+              </div>
+            )}
+          </div>
         </div>
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>

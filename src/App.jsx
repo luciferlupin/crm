@@ -25,27 +25,27 @@ function AppContent() {
   }
 
   return (
-    <Router>
-      <div className="flex h-screen bg-gray-50">
-        <Sidebar />
-        <div className="flex-1 overflow-auto">
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/customers" element={<Customers />} />
-            <Route path="/leads" element={<Leads />} />
-            <Route path="/sales" element={<Sales />} />
-            <Route path="/tasks" element={<Tasks />} />
-          </Routes>
-        </div>
+    <div className="flex h-screen bg-gray-50">
+      <Sidebar />
+      <div className="flex-1 overflow-auto">
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/customers" element={<Customers />} />
+          <Route path="/leads" element={<Leads />} />
+          <Route path="/sales" element={<Sales />} />
+          <Route path="/tasks" element={<Tasks />} />
+        </Routes>
       </div>
-    </Router>
+    </div>
   )
 }
 
 function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <Router>
+        <AppContent />
+      </Router>
     </AuthProvider>
   )
 }
