@@ -1,69 +1,98 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Plus, Search, Calendar, Clock, User, CheckCircle, Circle, AlertCircle } from 'lucide-react'
+import { taskService } from '../services/taskService.js'
 
 const Tasks = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterPriority, setFilterPriority] = useState('all')
+  const [tasks, setTasks] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    priority: 'medium',
+    status: 'todo',
+    dueDate: '',
+    assignedTo: '',
+    category: 'General'
+  })
 
-  const tasks = [
-    {
-      id: 1,
-      title: 'Follow up with Tech Corp lead',
-      description: 'Discuss pricing options and schedule demo',
-      priority: 'high',
-      status: 'todo',
-      dueDate: '2024-01-10',
-      assignedTo: 'John Doe',
-      category: 'Sales'
-    },
-    {
-      id: 2,
-      title: 'Prepare Q1 sales report',
-      description: 'Compile sales data and create presentation',
-      priority: 'medium',
-      status: 'in-progress',
-      dueDate: '2024-01-15',
-      assignedTo: 'Jane Smith',
-      category: 'Reporting'
-    },
-    {
-      id: 3,
-      title: 'Call new customers for onboarding',
-      description: 'Welcome call and product walkthrough',
-      priority: 'high',
-      status: 'todo',
-      dueDate: '2024-01-09',
-      assignedTo: 'Mike Johnson',
-      category: 'Customer Success'
-    },
-    {
-      id: 4,
-      title: 'Update CRM documentation',
-      description: 'Add new features and best practices',
-      priority: 'low',
-      status: 'completed',
-      dueDate: '2024-01-08',
-      assignedTo: 'Sarah Wilson',
-      category: 'Documentation'
-    },
-    {
-      id: 5,
-      title: 'Review lead scoring criteria',
-      description: 'Analyze conversion rates and adjust scoring',
-      priority: 'medium',
-      status: 'todo',
-      dueDate: '2024-01-12',
-      assignedTo: 'John Doe',
-      category: 'Strategy'
+  useEffect(() => {
+    fetchTasks()
+  }, [])
+
+  const fetchTasks = async () => {
+    try {
+      setLoading(true)
+      const data = await taskService.fetchTasks()
+      setTasks(data)
+    } catch (error) {
+      console.error('Error fetching tasks:', error)
+    } finally {
+      setLoading(false)
     }
-  ]
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    try {
+      const newTask = await taskService.insertTask(formData)
+      setTasks([newTask, ...tasks])
+      setShowAddForm(false)
+      setFormData({
+        title: '',
+        description: '',
+        priority: 'medium',
+        status: 'todo',
+        dueDate: '',
+        assignedTo: '',
+        category: 'General'
+      })
+    } catch (error) {
+      console.error('Error adding task:', error)
+    }
+  }
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this task?')) {
+      try {
+        await taskService.deleteTask(id)
+        setTasks(tasks.filter(task => task.id !== id))
+      } catch (error) {
+        console.error('Error deleting task:', error)
+      }
+    }
+  }
+
+  const handleStatusToggle = async (id, currentStatus) => {
+    const newStatus = currentStatus === 'completed' ? 'todo' : 'completed'
+    try {
+      await taskService.updateTask(id, { status: newStatus })
+      setTasks(tasks.map(task => 
+        task.id === id ? { ...task, status: newStatus } : task
+      ))
+    } catch (error) {
+      console.error('Error updating task:', error)
+    }
+  }
 
   const filteredTasks = tasks.filter(task => {
     const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          task.description.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesFilter = filterPriority === 'all' || task.priority === filterPriority
-    return matchesSearch && matchesFilter
+    const matchesPriority = filterPriority === 'all' || task.priority === filterPriority
+    return matchesSearch && matchesPriority
   })
+
+  if (loading) {
+    return (
+      <div className="p-8">
+        <div className="flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+        </div>
+      </div>
+    )
+  }
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -110,11 +139,79 @@ const Tasks = () => {
           <h1 className="text-3xl font-bold text-gray-800">Tasks</h1>
           <p className="text-gray-600 mt-2">Manage your team's tasks and deadlines</p>
         </div>
-        <button className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center">
+        <button 
+          onClick={() => setShowAddForm(!showAddForm)}
+          className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center"
+        >
           <Plus size={20} className="mr-2" />
           Add Task
         </button>
       </div>
+
+      {showAddForm && (
+        <div className="mb-6 bg-white p-6 rounded-lg border border-gray-200">
+          <h3 className="text-lg font-medium mb-4">Add New Task</h3>
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+              <input
+                type="text"
+                required
+                value={formData.title}
+                onChange={(e) => setFormData({...formData, title: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Assigned To</label>
+              <input
+                type="text"
+                value={formData.assignedTo}
+                onChange={(e) => setFormData({...formData, assignedTo: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                rows="3"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+              <select
+                value={formData.priority}
+                onChange={(e) => setFormData({...formData, priority: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              >
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+              <input
+                type="date"
+                value={formData.dueDate}
+                onChange={(e) => setFormData({...formData, dueDate: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <button
+                type="submit"
+                className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
+              >
+                Add Task
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="bg-white rounded-xl shadow-sm p-6">
@@ -182,39 +279,58 @@ const Tasks = () => {
         </div>
 
         <div className="divide-y divide-gray-200">
-          {filteredTasks.map((task) => (
-            <div key={task.id} className="p-6 hover:bg-gray-50 transition-colors">
-              <div className="flex items-start space-x-4">
-                <button className="mt-1">
-                  {getStatusIcon(task.status)}
-                </button>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-medium text-gray-900">{task.title}</h3>
-                    <div className="flex items-center space-x-2">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(task.priority)}`}>
-                        {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-                      </span>
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getCategoryColor(task.category)}`}>
-                        {task.category}
-                      </span>
+          {filteredTasks.length === 0 ? (
+            <div className="p-12 text-center">
+              <div className="text-gray-500">
+                <CheckCircle className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                <p>No tasks found</p>
+                <p className="text-sm mt-1">Add your first task to get started</p>
+              </div>
+            </div>
+          ) : (
+            filteredTasks.map((task) => (
+              <div key={task.id} className="p-6 hover:bg-gray-50 transition-colors">
+                <div className="flex items-start space-x-4">
+                  <button 
+                    onClick={() => handleStatusToggle(task.id, task.status)}
+                    className="mt-1"
+                  >
+                    {getStatusIcon(task.status)}
+                  </button>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-lg font-medium text-gray-900">{task.title}</h3>
+                      <div className="flex items-center space-x-2">
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(task.priority)}`}>
+                          {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                        </span>
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getCategoryColor(task.category)}`}>
+                          {task.category}
+                        </span>
+                        <button 
+                          onClick={() => handleDelete(task.id)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                  <p className="text-gray-600 mb-3">{task.description}</p>
-                  <div className="flex items-center space-x-4 text-sm text-gray-500">
-                    <div className="flex items-center">
-                      <Calendar size={16} className="mr-1" />
-                      Due: {task.dueDate}
-                    </div>
-                    <div className="flex items-center">
-                      <User size={16} className="mr-1" />
-                      {task.assignedTo}
+                    <p className="text-gray-600 mb-3">{task.description}</p>
+                    <div className="flex items-center space-x-4 text-sm text-gray-500">
+                      <div className="flex items-center">
+                        <Calendar size={16} className="mr-1" />
+                        Due: {task.dueDate}
+                      </div>
+                      <div className="flex items-center">
+                        <User size={16} className="mr-1" />
+                        {task.assignedTo}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>

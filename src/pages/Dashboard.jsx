@@ -1,43 +1,127 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Users, TrendingUp, Target, DollarSign, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import SalesChart from '../components/SalesChart.jsx'
 import RecentActivity from '../components/RecentActivity.jsx'
+import { leadService } from '../services/leadService.js'
+import { customerService } from '../services/customerService.js'
+import { taskService } from '../services/taskService.js'
 
 const Dashboard = () => {
-  const stats = [
+  const [stats, setStats] = useState([
     {
       title: 'Total Customers',
-      value: '1,234',
-      change: '+12%',
+      value: '0',
+      change: '+0',
       changeType: 'positive',
       icon: Users,
       color: 'bg-blue-500'
     },
     {
       title: 'Active Leads',
-      value: '89',
-      change: '+5%',
+      value: '0',
+      change: '+0',
       changeType: 'positive',
       icon: Target,
       color: 'bg-green-500'
     },
     {
-      title: 'Monthly Revenue',
-      value: '$45,678',
-      change: '+8%',
+      title: 'Pipeline Value',
+      value: '$0',
+      change: '+$0',
       changeType: 'positive',
       icon: DollarSign,
       color: 'bg-yellow-500'
     },
     {
-      title: 'Conversion Rate',
-      value: '24%',
-      change: '-2%',
-      changeType: 'negative',
+      title: 'Tasks',
+      value: '0',
+      change: '+0',
+      changeType: 'positive',
       icon: TrendingUp,
       color: 'bg-purple-500'
     }
-  ]
+  ])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchDashboardData()
+  }, [])
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true)
+      
+      // Fetch all user data
+      const [leads, customers, tasks] = await Promise.all([
+        leadService.fetchLeads(),
+        customerService.fetchCustomers(),
+        taskService.fetchTasks()
+      ])
+      
+      // Calculate statistics
+      const totalCustomers = customers.length
+      const totalLeads = leads.length
+      const activeLeads = leads.filter(lead => lead.status !== 'lost').length
+      const totalTasks = tasks.length
+      
+      // Calculate pipeline value from leads
+      const pipelineValue = leads.reduce((sum, lead) => {
+        const value = parseFloat(lead.value) || 0
+        return sum + value
+      }, 0)
+      
+      // Update stats with real user data
+      setStats([
+        {
+          title: 'Total Customers',
+          value: totalCustomers.toString(),
+          change: totalCustomers > 0 ? `+${totalCustomers}` : '+0',
+          changeType: 'positive',
+          icon: Users,
+          color: 'bg-blue-500'
+        },
+        {
+          title: 'Active Leads',
+          value: activeLeads.toString(),
+          change: activeLeads > 0 ? `+${activeLeads}` : '+0',
+          changeType: 'positive',
+          icon: Target,
+          color: 'bg-green-500'
+        },
+        {
+          title: 'Pipeline Value',
+          value: `$${pipelineValue.toLocaleString()}`,
+          change: pipelineValue > 0 ? `+$${pipelineValue.toLocaleString()}` : '+$0',
+          changeType: 'positive',
+          icon: DollarSign,
+          color: 'bg-yellow-500'
+        },
+        {
+          title: 'Tasks',
+          value: totalTasks.toString(),
+          change: totalTasks > 0 ? `+${totalTasks}` : '+0',
+          changeType: 'positive',
+          icon: TrendingUp,
+          color: 'bg-purple-500'
+        }
+      ])
+      
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="p-8">
+        <div className="flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="p-8">

@@ -1,77 +1,47 @@
-import { supabase } from '../config/supabase'
+// User's personal leads data (starts empty)
+let userLeads = []
 
 export const leadService = {
-  // Fetch all leads for the current user
+  // Fetch user's leads (starts empty)
   async fetchLeads() {
-    try {
-      const { data, error } = await supabase
-        .from('leads')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-      return data
-    } catch (error) {
-      console.error('Error fetching leads:', error)
-      throw error
-    }
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 300))
+    return userLeads
   },
 
-  // Insert a new lead
+  // Insert new lead
   async insertLead(leadData) {
-    try {
-      const { data, error } = await supabase
-        .from('leads')
-        .insert([{
-          ...leadData,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }])
-        .select()
-        .single()
-
-      if (error) throw error
-      return data
-    } catch (error) {
-      console.error('Error inserting lead:', error)
-      throw error
+    const newLead = {
+      id: Date.now().toString(),
+      ...leadData,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     }
+    userLeads.unshift(newLead)
+    return newLead
   },
 
-  // Update an existing lead
+  // Update existing lead
   async updateLead(id, updates) {
-    try {
-      const { data, error } = await supabase
-        .from('leads')
-        .update({
-          ...updates,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', id)
-        .select()
-        .single()
-
-      if (error) throw error
-      return data
-    } catch (error) {
-      console.error('Error updating lead:', error)
-      throw error
+    const index = userLeads.findIndex(lead => lead.id === id)
+    if (index !== -1) {
+      userLeads[index] = {
+        ...userLeads[index],
+        ...updates,
+        updated_at: new Date().toISOString()
+      }
+      return userLeads[index]
     }
+    throw new Error('Lead not found')
   },
 
-  // Delete a lead
+  // Delete lead
   async deleteLead(id) {
-    try {
-      const { error } = await supabase
-        .from('leads')
-        .delete()
-        .eq('id', id)
-
-      if (error) throw error
+    const index = userLeads.findIndex(lead => lead.id === id)
+    if (index !== -1) {
+      userLeads.splice(index, 1)
       return true
-    } catch (error) {
-      console.error('Error deleting lead:', error)
-      throw error
     }
+    throw new Error('Lead not found')
   }
 }
