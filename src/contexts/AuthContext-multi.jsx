@@ -21,11 +21,14 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Get initial session
     const getSession = async () => {
+      console.log('AuthContext: Getting initial session...')
       const { data: { session } } = await crmSupabase.auth.getSession()
+      console.log('AuthContext: Initial session:', session)
       setUser(session?.user ?? null)
       
       // If user exists, get their Supabase project
       if (session?.user) {
+        console.log('AuthContext: User found, loading project...')
         await loadUserProject(session.user.id)
       }
       
@@ -37,11 +40,14 @@ export const AuthProvider = ({ children }) => {
     // Listen for auth changes
     const { data: { subscription } } = crmSupabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('AuthContext: Auth state changed:', { event, session })
         setUser(session?.user ?? null)
         
         if (session?.user) {
+          console.log('AuthContext: User logged in, loading project...')
           await loadUserProject(session.user.id)
         } else {
+          console.log('AuthContext: User logged out, clearing project...')
           setUserProject(null)
           setUserSupabase(null)
         }
