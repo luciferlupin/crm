@@ -1,144 +1,43 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React from 'react'
 import { Users, TrendingUp, Target, DollarSign, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import SalesChart from '../components/SalesChart.jsx'
 import RecentActivity from '../components/RecentActivity.jsx'
-import { useAuth } from '../contexts/AuthContext-multi.jsx'
-import { leadService } from '../services/leadService-multi.js'
 
 const Dashboard = () => {
-  const { userSupabase } = useAuth()
-  const [stats, setStats] = useState([
+  const stats = [
     {
       title: 'Total Customers',
-      value: '0',
-      change: '+0%',
+      value: '1,234',
+      change: '+12%',
       changeType: 'positive',
       icon: Users,
       color: 'bg-blue-500'
     },
     {
       title: 'Active Leads',
-      value: '0',
-      change: '+0%',
+      value: '89',
+      change: '+5%',
       changeType: 'positive',
       icon: Target,
       color: 'bg-green-500'
     },
     {
       title: 'Monthly Revenue',
-      value: '$0',
-      change: '+0%',
+      value: '$45,678',
+      change: '+8%',
       changeType: 'positive',
       icon: DollarSign,
       color: 'bg-yellow-500'
     },
     {
       title: 'Conversion Rate',
-      value: '0%',
-      change: '+0%',
-      changeType: 'positive',
+      value: '24%',
+      change: '-2%',
+      changeType: 'negative',
       icon: TrendingUp,
       color: 'bg-purple-500'
     }
-  ])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    fetchDashboardData()
-  }, [userSupabase])
-
-  const fetchDashboardData = async () => {
-    if (!userSupabase) {
-      setLoading(false)
-      return
-    }
-
-    try {
-      setLoading(true)
-      
-      // Fetch leads data
-      const leads = await leadService.getLeads()
-      
-      // Calculate statistics
-      const totalLeads = leads.length
-      const activeLeads = leads.filter(lead => lead.status !== 'lost').length
-      const qualifiedLeads = leads.filter(lead => lead.status === 'qualified').length
-      const conversionRate = totalLeads > 0 ? ((qualifiedLeads / totalLeads) * 100).toFixed(1) : 0
-      
-      // Calculate estimated revenue (you may want to add a 'value' field to leads)
-      const estimatedRevenue = leads.reduce((sum, lead) => {
-        const value = parseFloat(lead.value) || 0
-        return sum + value
-      }, 0)
-      
-      // Update stats with real data
-      setStats([
-        {
-          title: 'Total Leads',
-          value: totalLeads.toString(),
-          change: activeLeads > 0 ? `+${activeLeads}` : '+0',
-          changeType: 'positive',
-          icon: Users,
-          color: 'bg-blue-500'
-        },
-        {
-          title: 'Active Leads',
-          value: activeLeads.toString(),
-          change: qualifiedLeads > 0 ? `+${qualifiedLeads}` : '+0',
-          changeType: 'positive',
-          icon: Target,
-          color: 'bg-green-500'
-        },
-        {
-          title: 'Pipeline Value',
-          value: `$${estimatedRevenue.toLocaleString()}`,
-          change: estimatedRevenue > 0 ? '+$' + estimatedRevenue.toLocaleString() : '+$0',
-          changeType: 'positive',
-          icon: DollarSign,
-          color: 'bg-yellow-500'
-        },
-        {
-          title: 'Conversion Rate',
-          value: `${conversionRate}%`,
-          change: conversionRate > 0 ? `+${conversionRate}%` : '+0%',
-          changeType: 'positive',
-          icon: TrendingUp,
-          color: 'bg-purple-500'
-        }
-      ])
-      
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  if (!userSupabase) {
-    return (
-      <div className="p-8">
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
-          <div className="flex items-center">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-600 mr-3"></div>
-            <div>
-              <h3 className="text-lg font-medium text-yellow-800">Initializing Your Dashboard</h3>
-              <p className="text-yellow-600 mt-1">Setting up your personal CRM dashboard...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (loading) {
-    return (
-      <div className="p-8">
-        <div className="flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-        </div>
-      </div>
-    )
-  }
+  ]
 
   return (
     <div className="p-8">
