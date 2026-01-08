@@ -5,6 +5,7 @@ import RecentActivity from '../components/RecentActivity.jsx'
 import { leadService } from '../services/leadService.js'
 import { customerService } from '../services/customerService.js'
 import { taskService } from '../services/taskService.js'
+import { salesService } from '../services/salesService.js'
 
 const Dashboard = () => {
   const [stats, setStats] = useState([
@@ -52,10 +53,11 @@ const Dashboard = () => {
       setLoading(true)
       
       // Fetch all user data
-      const [leads, customers, tasks] = await Promise.all([
+      const [leads, customers, tasks, sales] = await Promise.all([
         leadService.fetchLeads(),
         customerService.fetchCustomers(),
-        taskService.fetchTasks()
+        taskService.fetchTasks(),
+        salesService.fetchSales()
       ])
       
       // Calculate statistics
@@ -68,6 +70,12 @@ const Dashboard = () => {
       const pipelineValue = leads.reduce((sum, lead) => {
         const value = parseFloat(lead.value) || 0
         return sum + value
+      }, 0)
+      
+      // Calculate total revenue from sales
+      const totalRevenue = sales.reduce((sum, sale) => {
+        const amount = parseFloat(sale.amount) || 0
+        return sum + amount
       }, 0)
       
       // Update stats with real user data
@@ -89,9 +97,9 @@ const Dashboard = () => {
           color: 'bg-green-500'
         },
         {
-          title: 'Pipeline Value',
-          value: `$${pipelineValue.toLocaleString()}`,
-          change: pipelineValue > 0 ? `+$${pipelineValue.toLocaleString()}` : '+$0',
+          title: 'Total Revenue',
+          value: `$${totalRevenue.toLocaleString()}`,
+          change: totalRevenue > 0 ? `+$${totalRevenue.toLocaleString()}` : '+$0',
           changeType: 'positive',
           icon: DollarSign,
           color: 'bg-yellow-500'

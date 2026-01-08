@@ -1,45 +1,68 @@
-// User's personal leads data (starts empty)
-let userLeads = []
+// User's personal leads data with localStorage persistence
+const STORAGE_KEY = 'crm_leads'
+
+const getStoredLeads = () => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    return stored ? JSON.parse(stored) : []
+  } catch (error) {
+    console.error('Error loading leads from localStorage:', error)
+    return []
+  }
+}
+
+const saveLeads = (leads) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(leads))
+  } catch (error) {
+    console.error('Error saving leads to localStorage:', error)
+  }
+}
 
 export const leadService = {
-  // Fetch user's leads (starts empty)
+  // Fetch user's leads from localStorage
   async fetchLeads() {
-    // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 300))
-    return userLeads
+    return getStoredLeads()
   },
 
-  // Insert new lead
+  // Insert new lead and save to localStorage
   async insertLead(leadData) {
+    const leads = getStoredLeads()
     const newLead = {
       id: Date.now().toString(),
       ...leadData,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     }
-    userLeads.unshift(newLead)
+    leads.unshift(newLead)
+    saveLeads(leads)
     return newLead
   },
 
-  // Update existing lead
+  // Update existing lead and save to localStorage
   async updateLead(id, updates) {
-    const index = userLeads.findIndex(lead => lead.id === id)
+    const leads = getStoredLeads()
+    const index = leads.findIndex(lead => lead.id === id)
     if (index !== -1) {
-      userLeads[index] = {
-        ...userLeads[index],
+      leads[index] = {
+        ...leads[index],
         ...updates,
         updated_at: new Date().toISOString()
       }
-      return userLeads[index]
+      saveLeads(leads)
+      return leads[index]
     }
     throw new Error('Lead not found')
   },
 
-  // Delete lead
+  // Delete lead and save to localStorage
   async deleteLead(id) {
-    const index = userLeads.findIndex(lead => lead.id === id)
+    const leads = getStoredLeads()
+    const index = leads.findIndex(lead => lead.id === id)
     if (index !== -1) {
-      userLeads.splice(index, 1)
+      leads.splice(index, 1)
+      saveLeads(leads)
       return true
     }
     throw new Error('Lead not found')

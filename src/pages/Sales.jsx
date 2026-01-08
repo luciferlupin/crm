@@ -1,87 +1,199 @@
-import React from 'react'
-import { TrendingUp, DollarSign, ShoppingCart, Users, Calendar, Filter } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { TrendingUp, DollarSign, ShoppingCart, Users, Calendar, Filter, Plus } from 'lucide-react'
 import SalesChart from '../components/SalesChart.jsx'
 import TopProducts from '../components/TopProducts.jsx'
+import { salesService } from '../services/salesService.js'
 
 const Sales = () => {
+  const [sales, setSales] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [formData, setFormData] = useState({
+    customer: '',
+    product: '',
+    amount: '',
+    date: new Date().toISOString().split('T')[0],
+    status: 'Completed'
+  })
+
+  useEffect(() => {
+    fetchSales()
+  }, [])
+
+  const fetchSales = async () => {
+    try {
+      setLoading(true)
+      const data = await salesService.fetchSales()
+      setSales(data)
+    } catch (error) {
+      console.error('Error fetching sales:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    try {
+      const newSale = await salesService.insertSale(formData)
+      setSales([newSale, ...sales])
+      setShowAddForm(false)
+      setFormData({
+        customer: '',
+        product: '',
+        amount: '',
+        date: new Date().toISOString().split('T')[0],
+        status: 'Completed'
+      })
+    } catch (error) {
+      console.error('Error adding sale:', error)
+    }
+  }
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this sale?')) {
+      try {
+        await salesService.deleteSale(id)
+        setSales(sales.filter(sale => sale.id !== id))
+      } catch (error) {
+        console.error('Error deleting sale:', error)
+      }
+    }
+  }
+
+  // Calculate stats from user data
+  const totalRevenue = sales.reduce((sum, sale) => {
+    const amount = parseFloat(sale.amount?.replace(/[^0-9.-]/g, '')) || 0
+    return sum + amount
+  }, 0)
+
+  const totalOrders = sales.length
+  const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0
+  const completedSales = sales.filter(sale => sale.status === 'Completed').length
+
   const stats = [
     {
       title: 'Total Revenue',
-      value: '$234,567',
-      change: '+12.5%',
+      value: `$${totalRevenue.toLocaleString()}`,
+      change: totalRevenue > 0 ? '+$' + totalRevenue.toLocaleString() : '+$0',
       icon: DollarSign,
       color: 'bg-green-500'
     },
     {
       title: 'Total Orders',
-      value: '1,456',
-      change: '+8.2%',
+      value: totalOrders.toString(),
+      change: totalOrders > 0 ? `+${totalOrders}` : '+0',
       icon: ShoppingCart,
       color: 'bg-blue-500'
     },
     {
       title: 'Average Order Value',
-      value: '$161',
-      change: '+3.1%',
+      value: `$${Math.round(averageOrderValue).toLocaleString()}`,
+      change: averageOrderValue > 0 ? `+$${Math.round(averageOrderValue).toLocaleString()}` : '+$0',
       icon: TrendingUp,
       color: 'bg-purple-500'
     },
     {
-      title: 'New Customers',
-      value: '234',
-      change: '+15.3%',
+      title: 'Completed Sales',
+      value: completedSales.toString(),
+      change: completedSales > 0 ? `+${completedSales}` : '+0',
       icon: Users,
       color: 'bg-yellow-500'
     }
   ]
 
-  const recentSales = [
-    {
-      id: 1,
-      customer: 'Sarah Johnson',
-      product: 'Enterprise Plan',
-      amount: '$5,000',
-      date: '2024-01-08',
-      status: 'Completed'
-    },
-    {
-      id: 2,
-      customer: 'Michael Chen',
-      product: 'Professional Plan',
-      amount: '$2,500',
-      date: '2024-01-08',
-      status: 'Completed'
-    },
-    {
-      id: 3,
-      customer: 'Emily Davis',
-      product: 'Starter Plan',
-      amount: '$500',
-      date: '2024-01-07',
-      status: 'Pending'
-    },
-    {
-      id: 4,
-      customer: 'Robert Wilson',
-      product: 'Enterprise Plan',
-      amount: '$5,000',
-      date: '2024-01-07',
-      status: 'Completed'
-    }
-  ]
-
-  return (
+  if (loading) {
+    return (
+      <div className="p-8">
+        <div className="flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+        </div>
+      </div>
+    )
+  }
+      return (
     <div className="p-8">
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-800">Sales Analytics</h1>
           <p className="text-gray-600 mt-2">Track your sales performance and revenue</p>
         </div>
-        <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center">
-          <Filter size={20} className="mr-2" />
-          Filter
+        <button 
+          onClick={() => setShowAddForm(!showAddForm)}
+          className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center"
+        >
+          <Plus size={20} className="mr-2" />
+          Add Sale
         </button>
       </div>
+
+      {showAddForm && (
+        <div className="mb-6 bg-white p-6 rounded-lg border border-gray-200">
+          <h3 className="text-lg font-medium mb-4">Add New Sale</h3>
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Customer</label>
+              <input
+                type="text"
+                required
+                value={formData.customer}
+                onChange={(e) => setFormData({...formData, customer: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Product</label>
+              <input
+                type="text"
+                required
+                value={formData.product}
+                onChange={(e) => setFormData({...formData, product: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
+              <input
+                type="number"
+                required
+                value={formData.amount}
+                onChange={(e) => setFormData({...formData, amount: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+              <input
+                type="date"
+                required
+                value={formData.date}
+                onChange={(e) => setFormData({...formData, date: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+              <select
+                value={formData.status}
+                onChange={(e) => setFormData({...formData, status: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              >
+                <option value="Completed">Completed</option>
+                <option value="Pending">Pending</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+            </div>
+            <div className="md:col-span-2">
+              <button
+                type="submit"
+                className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
+              >
+                Add Sale
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {stats.map((stat, index) => {
@@ -146,34 +258,59 @@ const Sales = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {recentSales.map((sale) => (
-                <tr key={sale.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {sale.customer}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {sale.product}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {sale.amount}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {sale.date}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      sale.status === 'Completed' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {sale.status}
-                    </span>
+              {sales.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="px-6 py-12 text-center">
+                    <div className="text-gray-500">
+                      <ShoppingCart className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                      <p>No sales found</p>
+                      <p className="text-sm mt-1">Add your first sale to get started</p>
+                    </div>
                   </td>
                 </tr>
-              ))}
+              ) : (
+                sales.map((sale) => (
+                  <tr key={sale.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {sale.customer}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {sale.product}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      ${parseFloat(sale.amount).toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {sale.date}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        sale.status === 'Completed' 
+                          ? 'bg-green-100 text-green-800' 
+                          : sale.status === 'Pending'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {sale.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <button 
+                        onClick={() => handleDelete(sale.id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
