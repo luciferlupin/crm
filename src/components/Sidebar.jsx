@@ -9,7 +9,8 @@ import {
   Menu,
   X,
   LogOut,
-  Package
+  Package,
+  Warehouse
 } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext.jsx'
@@ -24,6 +25,7 @@ const Sidebar = () => {
     { name: 'Leads', icon: Target, path: '/leads' },
     { name: 'Sales', icon: TrendingUp, path: '/sales' },
     { name: 'Products', icon: Package, path: '/products' },
+    { name: 'Inventory', icon: Warehouse, path: '/inventory' },
     { name: 'Tasks', icon: CheckSquare, path: '/tasks' },
   ]
 

@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react'
-import { Plus, Search, Calendar, Clock, User, CheckCircle, Circle, AlertCircle } from 'lucide-react'
+import { Plus, Search, Clock, User, CheckCircle, Circle, AlertCircle, Edit2, Trash2, BarChart3, Layout, TrendingUp, Users, Target, Activity, AlertTriangle, Calendar } from 'lucide-react'
 import { taskService } from '../services/taskService.js'
 
 const Tasks = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterPriority, setFilterPriority] = useState('all')
+  const [filterStatus, setFilterStatus] = useState('all')
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
   const [showAddForm, setShowAddForm] = useState(false)
+  const [showEditForm, setShowEditForm] = useState(false)
+  const [selectedTask, setSelectedTask] = useState(null)
+  const [viewMode, setViewMode] = useState('list') // list, kanban, analytics
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -15,8 +19,38 @@ const Tasks = () => {
     status: 'todo',
     dueDate: '',
     assignedTo: '',
-    category: 'General'
+    category: 'General',
+    estimatedHours: '',
+    actualHours: ''
   })
+
+  // Status options including overdue
+  const statusOptions = [
+    { value: 'todo', label: '📋 To Do', color: 'text-gray-600' },
+    { value: 'in-progress', label: '⚡ In Progress', color: 'text-yellow-600' },
+    { value: 'completed', label: '✅ Completed', color: 'text-green-600' },
+    { value: 'overdue', label: '⚠️ Overdue', color: 'text-red-600' }
+  ]
+
+  // View mode options (removed calendar)
+  const viewModes = [
+    { value: 'list', label: 'List View', icon: Layout },
+    { value: 'kanban', label: 'Kanban Board', icon: BarChart3 },
+    { value: 'analytics', label: 'Analytics', icon: TrendingUp }
+  ]
+
+  // Months list
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ]
+
+  // Generate years from current year to 10 years forward
+  const currentYear = new Date().getFullYear()
+  const years = Array.from({ length: 11 }, (_, i) => currentYear + i)
+
+  // Generate days array (1-31)
+  const days = Array.from({ length: 31 }, (_, i) => i + 1)
 
   useEffect(() => {
     fetchTasks()
@@ -47,10 +81,53 @@ const Tasks = () => {
         status: 'todo',
         dueDate: '',
         assignedTo: '',
-        category: 'General'
+        category: 'General',
+        estimatedHours: '',
+        actualHours: ''
       })
     } catch (error) {
       console.error('Error adding task:', error)
+    }
+  }
+
+  const handleEdit = (task) => {
+    setSelectedTask(task)
+    setFormData({
+      title: task.title,
+      description: task.description,
+      priority: task.priority,
+      status: task.status,
+      dueDate: task.dueDate,
+      assignedTo: task.assignedTo,
+      category: task.category,
+      estimatedHours: task.estimatedHours || '',
+      actualHours: task.actualHours || ''
+    })
+    setShowEditForm(true)
+  }
+
+  const handleUpdate = async (e) => {
+    e.preventDefault()
+    try {
+      await taskService.updateTask(selectedTask.id, formData)
+      setTasks(tasks.map(task => 
+        task.id === selectedTask.id ? { ...task, ...formData } : task
+      ))
+      setShowEditForm(false)
+      setSelectedTask(null)
+      setFormData({
+        title: '',
+        description: '',
+        priority: 'medium',
+        status: 'todo',
+        dueDate: '',
+        assignedTo: '',
+        category: 'General',
+        estimatedHours: '',
+        actualHours: ''
+      })
+    } catch (error) {
+      console.error('Error updating task:', error)
     }
   }
 
@@ -66,7 +143,19 @@ const Tasks = () => {
   }
 
   const handleStatusToggle = async (id, currentStatus) => {
-    const newStatus = currentStatus === 'completed' ? 'todo' : 'completed'
+    let newStatus
+    if (currentStatus === 'completed') {
+      newStatus = 'todo'
+    } else if (currentStatus === 'todo') {
+      newStatus = 'in-progress'
+    } else if (currentStatus === 'in-progress') {
+      newStatus = 'completed'
+    } else if (currentStatus === 'overdue') {
+      newStatus = 'in-progress'
+    } else {
+      newStatus = 'todo'
+    }
+    
     try {
       await taskService.updateTask(id, { status: newStatus })
       setTasks(tasks.map(task => 
@@ -81,8 +170,17 @@ const Tasks = () => {
     const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          task.description.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesPriority = filterPriority === 'all' || task.priority === filterPriority
-    return matchesSearch && matchesPriority
+    const matchesStatus = filterStatus === 'all' || task.status === filterStatus
+    return matchesSearch && matchesPriority && matchesStatus
   })
+
+  // Group tasks by status for Kanban view
+  const kanbanTasks = {
+    todo: filteredTasks.filter(t => t.status === 'todo'),
+    inProgress: filteredTasks.filter(t => t.status === 'in-progress'),
+    completed: filteredTasks.filter(t => t.status === 'completed'),
+    overdue: filteredTasks.filter(t => t.status === 'overdue')
+  }
 
   if (loading) {
     return (
@@ -94,12 +192,26 @@ const Tasks = () => {
     )
   }
 
+  // Analytics calculations
+  const taskStats = {
+    todo: tasks.filter(t => t.status === 'todo').length,
+    inProgress: tasks.filter(t => t.status === 'in-progress').length,
+    completed: tasks.filter(t => t.status === 'completed').length,
+    overdue: tasks.filter(t => t.status === 'overdue').length,
+    total: tasks.length,
+    completionRate: tasks.length > 0 ? Math.round((tasks.filter(t => t.status === 'completed').length / tasks.length) * 100) : 0,
+    totalEstimatedHours: tasks.reduce((sum, task) => sum + (parseFloat(task.estimatedHours) || 0), 0),
+    totalActualHours: tasks.reduce((sum, task) => sum + (parseFloat(task.actualHours) || 0), 0),
+    highPriorityTasks: tasks.filter(t => t.priority === 'high').length
+  }
+
   const getStatusIcon = (status) => {
     switch (status) {
       case 'todo': return <Circle className="text-gray-400" size={20} />
       case 'in-progress': return <AlertCircle className="text-yellow-500" size={20} />
       case 'completed': return <CheckCircle className="text-green-500" size={20} />
-      default: return null
+      case 'overdue': return <AlertTriangle className="text-red-500" size={20} />
+      default: return <Circle className="text-gray-400" size={20} />
     }
   }
 
@@ -123,15 +235,6 @@ const Tasks = () => {
     }
   }
 
-  const taskStats = {
-    todo: tasks.filter(t => t.status === 'todo').length,
-    inProgress: tasks.filter(t => t.status === 'in-progress').length,
-    completed: tasks.filter(t => t.status === 'completed').length,
-    overdue: tasks.filter(t => 
-      t.status !== 'completed' && new Date(t.dueDate) < new Date()
-    ).length
-  }
-
   return (
     <div className="p-8">
       <div className="flex justify-between items-center mb-8">
@@ -139,191 +242,676 @@ const Tasks = () => {
           <h1 className="text-3xl font-bold text-gray-800">Tasks</h1>
           <p className="text-gray-600 mt-2">Manage your team's tasks and deadlines</p>
         </div>
-        <button 
-          onClick={() => setShowAddForm(!showAddForm)}
-          className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center"
-        >
-          <Plus size={20} className="mr-2" />
-          Add Task
-        </button>
+        <div className="flex gap-2">
+          <button 
+            onClick={() => setShowAddForm(!showAddForm)}
+            className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center"
+          >
+            <Plus size={20} className="mr-2" />
+            Add Task
+          </button>
+        </div>
       </div>
 
-      {showAddForm && (
-        <div className="mb-6 bg-white p-6 rounded-lg border border-gray-200">
-          <h3 className="text-lg font-medium mb-4">Add New Task</h3>
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-              <input
-                type="text"
-                required
-                value={formData.title}
-                onChange={(e) => setFormData({...formData, title: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              />
+      {/* View Mode Selector */}
+      <div className="flex gap-2 mb-6">
+        {viewModes.map(mode => (
+          <button
+            key={mode.value}
+            onClick={() => setViewMode(mode.value)}
+            className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+              viewMode === mode.value ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            <mode.icon size={16} />
+            {mode.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Analytics Dashboard */}
+      {viewMode === 'analytics' && (
+        <div className="space-y-6">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Total Tasks</p>
+                  <p className="text-2xl font-bold text-gray-800">{taskStats.total}</p>
+                </div>
+                <Target className="text-blue-500" size={24} />
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Assigned To</label>
-              <input
-                type="text"
-                value={formData.assignedTo}
-                onChange={(e) => setFormData({...formData, assignedTo: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              />
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Completion Rate</p>
+                  <p className="text-2xl font-bold text-green-600">{taskStats.completionRate}%</p>
+                </div>
+                <TrendingUp className="text-green-500" size={24} />
+              </div>
             </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-              <textarea
-                value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                rows="3"
-              />
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Overdue Tasks</p>
+                  <p className="text-2xl font-bold text-red-600">{taskStats.overdue}</p>
+                </div>
+                <AlertTriangle className="text-red-500" size={24} />
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
-              <select
-                value={formData.priority}
-                onChange={(e) => setFormData({...formData, priority: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-              </select>
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">High Priority</p>
+                  <p className="text-2xl font-bold text-orange-600">{taskStats.highPriorityTasks}</p>
+                </div>
+                <AlertCircle className="text-orange-500" size={24} />
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
-              <input
-                type="date"
-                value={formData.dueDate}
-                onChange={(e) => setFormData({...formData, dueDate: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              />
+          </div>
+
+          {/* Progress Overview */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Activity size={20} className="text-blue-600" />
+                Task Status Distribution
+              </h3>
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>To Do</span>
+                    <span>{taskStats.todo}</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-gray-400 h-2 rounded-full"
+                      style={{ width: `${taskStats.total > 0 ? (taskStats.todo / taskStats.total) * 100 : 0}%` }}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>In Progress</span>
+                    <span>{taskStats.inProgress}</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-yellow-500 h-2 rounded-full"
+                      style={{ width: `${taskStats.total > 0 ? (taskStats.inProgress / taskStats.total) * 100 : 0}%` }}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>Overdue</span>
+                    <span>{taskStats.overdue}</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-red-500 h-2 rounded-full"
+                      style={{ width: `${taskStats.total > 0 ? (taskStats.overdue / taskStats.total) * 100 : 0}%` }}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>Completed</span>
+                    <span>{taskStats.completed}</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-green-500 h-2 rounded-full"
+                      style={{ width: `${taskStats.total > 0 ? (taskStats.completed / taskStats.total) * 100 : 0}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="md:col-span-2">
-              <button
-                type="submit"
-                className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
-              >
-                Add Task
-              </button>
+
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <Users size={20} className="text-purple-600" />
+                Team Performance
+              </h3>
+              <div className="space-y-4">
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">High Priority Tasks</span>
+                  <span className="font-semibold">{taskStats.highPriorityTasks}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Total Estimated Hours</span>
+                  <span className="font-semibold">{taskStats.totalEstimatedHours}h</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Total Actual Hours</span>
+                  <span className="font-semibold">{taskStats.totalActualHours}h</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Efficiency Rate</span>
+                  <span className="font-semibold">
+                    {taskStats.totalEstimatedHours > 0 ? 
+                      Math.round((taskStats.totalEstimatedHours / taskStats.totalActualHours) * 100) : 0}%
+                  </span>
+                </div>
+              </div>
             </div>
-          </form>
+          </div>
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">To Do</p>
-              <p className="text-2xl font-bold text-gray-800">{taskStats.todo}</p>
-            </div>
-            <Circle className="text-gray-400" size={24} />
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Completed</p>
-              <p className="text-2xl font-bold text-gray-800">{taskStats.completed}</p>
-            </div>
-            <CheckCircle className="text-green-500" size={24} />
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Overdue</p>
-              <p className="text-2xl font-bold text-red-600">{taskStats.overdue}</p>
-            </div>
-            <Clock className="text-red-500" size={24} />
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-xl shadow-sm">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-              <input
-                type="text"
-                placeholder="Search tasks..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              />
-            </div>
-            <select
-              value={filterPriority}
-              onChange={(e) => setFilterPriority(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              <option value="all">All Priority</option>
-              <option value="high">High</option>
-              <option value="medium">Medium</option>
-              <option value="low">Low</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="divide-y divide-gray-200">
-          {filteredTasks.length === 0 ? (
-            <div className="p-12 text-center">
-              <div className="text-gray-500">
-                <CheckCircle className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                <p>No tasks found</p>
-                <p className="text-sm mt-1">Add your first task to get started</p>
+      {/* Kanban View */}
+      {viewMode === 'kanban' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {Object.entries(kanbanTasks).map(([status, statusTasks]) => (
+            <div key={status} className="bg-white rounded-xl shadow-sm">
+              <div className="p-4 border-b border-gray-200">
+                <h3 className="font-semibold capitalize flex items-center gap-2">
+                  {getStatusIcon(status)}
+                  {status.replace('-', ' ')} ({statusTasks.length})
+                </h3>
+              </div>
+              <div className="p-4 space-y-3 min-h-[400px]">
+                {statusTasks.map(task => (
+                  <div
+                    key={task.id}
+                    className="bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                    onClick={() => handleEdit(task)}
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <h4 className="font-medium text-gray-900">{task.title}</h4>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleDelete(task.id)
+                        }}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">{task.description}</p>
+                    <div className="flex items-center justify-between">
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(task.priority)}`}>
+                        {task.priority}
+                      </span>
+                      {task.dueDate && (
+                        <div className="flex items-center text-xs text-gray-500">
+                          <Calendar size={12} className="mr-1" />
+                          {new Date(task.dueDate).toLocaleDateString()}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          ) : (
-            filteredTasks.map((task) => (
-              <div key={task.id} className="p-6 hover:bg-gray-50 transition-colors">
-                <div className="flex items-start space-x-4">
-                  <button 
-                    onClick={() => handleStatusToggle(task.id, task.status)}
-                    className="mt-1"
-                  >
-                    {getStatusIcon(task.status)}
-                  </button>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-lg font-medium text-gray-900">{task.title}</h3>
-                      <div className="flex items-center space-x-2">
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(task.priority)}`}>
-                          {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-                        </span>
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getCategoryColor(task.category)}`}>
-                          {task.category}
-                        </span>
-                        <button 
-                          onClick={() => handleDelete(task.id)}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          Delete
-                        </button>
-                      </div>
+          ))}
+        </div>
+      )}
+
+      {/* List View */}
+      {viewMode === 'list' && (
+        <>
+          {/* Add/Edit Form */}
+          {(showAddForm || showEditForm) && (
+            <div className="mb-6 bg-gradient-to-br from-white to-gray-50 p-8 rounded-2xl border border-gray-200 shadow-xl">
+              <div className="flex items-center gap-3 mb-6">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                  showEditForm ? 'bg-blue-100' : 'bg-green-100'
+                }`}>
+                  {showEditForm ? (
+                    <Edit2 className={`w-6 h-6 ${showEditForm ? 'text-blue-600' : 'text-green-600'}`} />
+                  ) : (
+                    <Plus className="w-6 h-6 text-green-600" />
+                  )}
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900">
+                    {showEditForm ? 'Edit Task' : 'Add New Task'}
+                  </h3>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {showEditForm ? 'Update task details and information' : 'Create a new task for your team'}
+                  </p>
+                </div>
+              </div>
+              
+              <form onSubmit={showEditForm ? handleUpdate : handleSubmit} className="space-y-6">
+                {/* Basic Information Section */}
+                <div className="bg-white p-6 rounded-xl border border-gray-100">
+                  <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                      <Target className="w-4 h-4 text-purple-600" />
                     </div>
-                    <p className="text-gray-600 mb-3">{task.description}</p>
-                    <div className="flex items-center space-x-4 text-sm text-gray-500">
-                      <div className="flex items-center">
-                        <Calendar size={16} className="mr-1" />
-                        Due: {task.dueDate}
-                      </div>
-                      <div className="flex items-center">
-                        <User size={16} className="mr-1" />
-                        {task.assignedTo}
+                    Basic Information
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+                        Task Title <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.title}
+                        onChange={(e) => setFormData({...formData, title: e.target.value})}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
+                        placeholder="Enter task title..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                        Assigned To
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.assignedTo}
+                        onChange={(e) => setFormData({...formData, assignedTo: e.target.value})}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
+                        placeholder="Assign to team member..."
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                        Description
+                      </label>
+                      <textarea
+                        value={formData.description}
+                        onChange={(e) => setFormData({...formData, description: e.target.value})}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 resize-none"
+                        rows="4"
+                        placeholder="Describe the task details..."
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Task Details Section */}
+                <div className="bg-white p-6 rounded-xl border border-gray-100">
+                  <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                      <Activity className="w-4 h-4 text-orange-600" />
+                    </div>
+                    Task Details
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+                        Priority
+                      </label>
+                      <select
+                        value={formData.priority}
+                        onChange={(e) => setFormData({...formData, priority: e.target.value})}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 appearance-none cursor-pointer"
+                      >
+                        <option value="low">🟢 Low Priority</option>
+                        <option value="medium">🟡 Medium Priority</option>
+                        <option value="high">🔴 High Priority</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                        Status
+                      </label>
+                      <select
+                        value={formData.status}
+                        onChange={(e) => setFormData({...formData, status: e.target.value})}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 appearance-none cursor-pointer"
+                      >
+                        {statusOptions.map(option => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                        Category
+                      </label>
+                      <select
+                        value={formData.category}
+                        onChange={(e) => setFormData({...formData, category: e.target.value})}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 appearance-none cursor-pointer"
+                      >
+                        <option value="General">📝 General</option>
+                        <option value="Sales">💰 Sales</option>
+                        <option value="Customer Success">😊 Customer Success</option>
+                        <option value="Reporting">📊 Reporting</option>
+                        <option value="Documentation">📚 Documentation</option>
+                        <option value="Strategy">🎯 Strategy</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
+                        Due Date
+                      </label>
+                      <div className="grid grid-cols-3 gap-2">
+                        <div>
+                          <select
+                            value={formData.dueDate ? new Date(formData.dueDate).getMonth() + 1 : ''}
+                            onChange={(e) => {
+                              const month = e.target.value
+                              const currentDay = formData.dueDate ? new Date(formData.dueDate).getDate() : 1
+                              const currentYear = formData.dueDate ? new Date(formData.dueDate).getFullYear() : new Date().getFullYear()
+                              const newDate = new Date(currentYear, month - 1, currentDay).toISOString().split('T')[0]
+                              setFormData({...formData, dueDate: newDate})
+                            }}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-primary-400 transition-colors duration-200"
+                          >
+                            <option value="">Month</option>
+                            {months.map((month, index) => (
+                              <option key={index} value={index + 1}>
+                                {month}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <select
+                            value={formData.dueDate ? new Date(formData.dueDate).getDate() : ''}
+                            onChange={(e) => {
+                              const day = e.target.value
+                              const currentMonth = formData.dueDate ? new Date(formData.dueDate).getMonth() + 1 : new Date().getMonth() + 1
+                              const currentYear = formData.dueDate ? new Date(formData.dueDate).getFullYear() : new Date().getFullYear()
+                              const newDate = new Date(currentYear, currentMonth - 1, day).toISOString().split('T')[0]
+                              setFormData({...formData, dueDate: newDate})
+                            }}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-primary-400 transition-colors duration-200"
+                          >
+                            <option value="">Day</option>
+                            {days.map((day, index) => (
+                              <option key={index} value={day}>
+                                {day}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <select
+                            value={formData.dueDate ? new Date(formData.dueDate).getFullYear() : ''}
+                            onChange={(e) => {
+                              const year = e.target.value
+                              const currentMonth = formData.dueDate ? new Date(formData.dueDate).getMonth() + 1 : new Date().getMonth() + 1
+                              const currentDay = formData.dueDate ? new Date(formData.dueDate).getDate() : new Date().getDate()
+                              const newDate = new Date(year, currentMonth - 1, currentDay).toISOString().split('T')[0]
+                              setFormData({...formData, dueDate: newDate})
+                            }}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-primary-400 transition-colors duration-200"
+                          >
+                            <option value="">Year</option>
+                            {years.map((year, index) => (
+                              <option key={index} value={year}>
+                                {year}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))
+
+                {/* Time Tracking Section */}
+                <div className="bg-white p-6 rounded-xl border border-gray-100">
+                  <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                      <Clock className="w-4 h-4 text-green-600" />
+                    </div>
+                    Time Tracking
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                        Estimated Hours
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          min="0"
+                          max="999"
+                          step="0.5"
+                          value={formData.estimatedHours}
+                          onChange={(e) => {
+                            const value = parseFloat(e.target.value)
+                            if (value >= 0 && value <= 999) {
+                              setFormData({...formData, estimatedHours: e.target.value})
+                            }
+                          }}
+                          className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
+                          placeholder="0.0"
+                        />
+                        <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                        Actual Hours
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          min="0"
+                          max="999"
+                          step="0.5"
+                          value={formData.actualHours}
+                          onChange={(e) => {
+                            const value = parseFloat(e.target.value)
+                            if (value >= 0 && value <= 999) {
+                              setFormData({...formData, actualHours: e.target.value})
+                            }
+                          }}
+                          className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
+                          placeholder="0.0"
+                        />
+                        <Activity className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-4 pt-4">
+                  <button
+                    type="submit"
+                    className={`flex-1 px-6 py-3 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 ${
+                      showEditForm 
+                        ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg' 
+                        : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg'
+                    }`}
+                  >
+                    {showEditForm ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <Edit2 size={18} />
+                        Update Task
+                      </span>
+                    ) : (
+                      <span className="flex items-center justify-center gap-2">
+                        <Plus size={18} />
+                        Create Task
+                      </span>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAddForm(false)
+                      setShowEditForm(false)
+                      setSelectedTask(null)
+                      setFormData({
+                        title: '',
+                        description: '',
+                        priority: 'medium',
+                        status: 'todo',
+                        dueDate: '',
+                        assignedTo: '',
+                        category: 'General',
+                        estimatedHours: '',
+                        actualHours: ''
+                      })
+                    }}
+                    className="px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-all duration-200 transform hover:scale-105"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
           )}
-        </div>
-      </div>
+
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">To Do</p>
+                  <p className="text-2xl font-bold text-gray-800">{taskStats.todo}</p>
+                </div>
+                <Circle className="text-gray-400" size={24} />
+              </div>
+            </div>
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Completed</p>
+                  <p className="text-2xl font-bold text-gray-800">{taskStats.completed}</p>
+                </div>
+                <CheckCircle className="text-green-500" size={24} />
+              </div>
+            </div>
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Overdue</p>
+                  <p className="text-2xl font-bold text-red-600">{taskStats.overdue}</p>
+                </div>
+                <Clock className="text-red-500" size={24} />
+              </div>
+            </div>
+          </div>
+
+          {/* Filters */}
+          <div className="bg-white rounded-xl shadow-sm">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                  <input
+                    type="text"
+                    placeholder="Search tasks..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
+                </div>
+                <select
+                  value={filterPriority}
+                  onChange={(e) => setFilterPriority(e.target.value)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                >
+                  <option value="all">All Priority</option>
+                  <option value="high">High</option>
+                  <option value="medium">Medium</option>
+                  <option value="low">Low</option>
+                </select>
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                >
+                  <option value="all">All Status</option>
+                  {statusOptions.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Task List */}
+            <div className="divide-y divide-gray-200">
+              {filteredTasks.length === 0 ? (
+                <div className="p-12 text-center">
+                  <div className="text-gray-500">
+                    <CheckCircle className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                    <p>No tasks found</p>
+                    <p className="text-sm mt-1">Add your first task to get started</p>
+                  </div>
+                </div>
+              ) : (
+                filteredTasks.map((task) => (
+                  <div key={task.id} className="p-6 hover:bg-gray-50 transition-colors">
+                    <div className="flex items-start space-x-4">
+                      <button 
+                        onClick={() => handleStatusToggle(task.id, task.status)}
+                        className="mt-1"
+                      >
+                        {getStatusIcon(task.status)}
+                      </button>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-lg font-medium text-gray-900">{task.title}</h3>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => handleEdit(task)}
+                              className="text-blue-600 hover:text-blue-900"
+                            >
+                              <Edit2 size={16} />
+                            </button>
+                            <button 
+                              onClick={() => handleDelete(task.id)}
+                              className="text-red-600 hover:text-red-900"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </div>
+                        <p className="text-gray-600 mb-3">{task.description}</p>
+                        <div className="flex items-center space-x-4 text-sm text-gray-500">
+                          <div className="flex items-center">
+                            <Calendar size={16} className="mr-1" />
+                            Due: {task.dueDate || 'No due date'}
+                          </div>
+                          <div className="flex items-center">
+                            <User size={16} className="mr-1" />
+                            {task.assignedTo || 'Unassigned'}
+                          </div>
+                          {task.estimatedHours && (
+                            <div className="flex items-center">
+                              <Clock size={16} className="mr-1" />
+                              Est: {task.estimatedHours}h
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex items-center space-x-2 mt-2">
+                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(task.priority)}`}>
+                            {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                          </span>
+                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${getCategoryColor(task.category)}`}>
+                            {task.category}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }

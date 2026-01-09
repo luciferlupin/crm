@@ -8,6 +8,7 @@ import Leads from './pages/Leads.jsx'
 import Sales from './pages/Sales.jsx'
 import Products from './pages/Products.jsx'
 import Tasks from './pages/Tasks.jsx'
+import Inventory from './pages/Inventory.jsx'
 import Login from './components/Login.jsx'
 
 function AppContent() {
@@ -40,6 +41,7 @@ function AppContent() {
           <Route path="/sales" element={<Sales />} />
           <Route path="/products" element={<Products />} />
           <Route path="/tasks" element={<Tasks />} />
+          <Route path="/inventory" element={<Inventory />} />
         </Routes>
       </div>
     </div>

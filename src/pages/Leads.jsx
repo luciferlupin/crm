@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { Plus, Search, Filter, Target, Clock, CheckCircle, XCircle, X, Edit2, Save, Phone, Mail, Building, Calendar, TrendingUp, User, IndianRupee, BarChart3, PieChart, Activity, MessageSquare, Video, Settings, ExternalLink, History, MessageCircle } from 'lucide-react'
+import { Plus, Search, Filter, Target, Clock, CheckCircle, XCircle, X, Edit2, Save, Phone, Mail, Building, Calendar, TrendingUp, User, IndianRupee, BarChart3, PieChart, Activity, MessageSquare, Video, Settings, ExternalLink, History, MessageCircle, UserPlus } from 'lucide-react'
 import { leadService } from '../services/leadService.js'
+import { formatIndianCurrency, parseIndianCurrency, formatIndianCurrencyInput } from '../utils/currency.js'
 
 const Leads = () => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -30,6 +31,7 @@ const Leads = () => {
     email: '',
     company: '',
     phone: '',
+    location: '',
     status: 'new',
     source: 'Website',
     value: '',
@@ -40,8 +42,85 @@ const Leads = () => {
     last_contacted: ''
   })
 
+  // Indian states list
+  const indianStates = [
+    'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa',
+    'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala',
+    'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland',
+    'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana',
+    'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
+    'Andaman and Nicobar Islands', 'Chandigarh', 'Dadra and Nagar Haveli',
+    'Daman and Diu', 'Delhi', 'Jammu and Kashmir', 'Ladakh',
+    'Lakshadweep', 'Puducherry'
+  ]
+
+  // Months list
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ]
+
+  // Generate years from current year to 10 years back
+  const currentYear = new Date().getFullYear()
+  const years = Array.from({ length: 11 }, (_, i) => currentYear - i)
+
+  // Generate days array (1-31)
+  const days = Array.from({ length: 31 }, (_, i) => i + 1)
+
+  // Save customer data to localStorage for use in other forms
+  const saveCustomerToStorage = (customerData) => {
+    const existingCustomers = JSON.parse(localStorage.getItem('crmCustomers') || '[]')
+    const customerIndex = existingCustomers.findIndex(c => c.email === customerData.email)
+    
+    if (customerIndex >= 0) {
+      // Update existing customer
+      existingCustomers[customerIndex] = customerData
+    } else {
+      // Add new customer
+      existingCustomers.push(customerData)
+    }
+    
+    localStorage.setItem('crmCustomers', JSON.stringify(existingCustomers))
+  }
+
+  // Get all customers from storage
+  const getAllCustomersFromStorage = () => {
+    return JSON.parse(localStorage.getItem('crmCustomers') || '[]')
+  }
+
+  // Auto-fill form with existing customer data
+  const autoFillFromExistingCustomer = (customerEmail) => {
+    const existingCustomers = getAllCustomersFromStorage()
+    const customer = existingCustomers.find(c => c.email === customerEmail)
+    
+    if (customer) {
+      setFormData({
+        name: customer.name || '',
+        email: customer.email || '',
+        company: customer.company || '',
+        phone: customer.phone || '',
+        location: customer.location || '',
+        status: 'new',
+        source: 'Website',
+        value: '', // Don't auto-fill value as it may differ
+        score: 50,
+        assigned_to: '',
+        notes: '',
+        created_date: new Date().toISOString().split('T')[0],
+        last_contacted: ''
+      })
+    }
+  }
+
   useEffect(() => {
     fetchLeads()
+    
+    // Set up real-time refresh every 30 seconds
+    const interval = setInterval(() => {
+      fetchLeads()
+    }, 30000)
+    
+    return () => clearInterval(interval)
   }, [])
 
   const fetchLeads = async () => {
@@ -79,11 +158,25 @@ const Leads = () => {
     try {
       const newLead = await leadService.insertLead(formData)
       setLeads([newLead, ...leads])
+      
+      // Save customer data to unified storage
+      saveCustomerToStorage({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        company: formData.company,
+        location: formData.location,
+        status: 'Active',
+        joinDate: new Date().toISOString().split('T')[0]
+      })
+      
+      setShowAddForm(false)
       setFormData({
         name: '',
         email: '',
         company: '',
         phone: '',
+        location: '',
         status: 'new',
         source: 'Website',
         value: '',
@@ -93,10 +186,8 @@ const Leads = () => {
         created_date: new Date().toISOString().split('T')[0],
         last_contacted: ''
       })
-      setShowAddForm(false)
     } catch (error) {
-      setError('Failed to add lead')
-      console.error('Error:', error)
+      console.error('Error adding lead:', error)
     }
   }
 
@@ -107,6 +198,7 @@ const Leads = () => {
       email: lead.email,
       company: lead.company,
       phone: lead.phone,
+      location: lead.location || '',
       status: lead.status,
       source: lead.source,
       value: lead.value,
@@ -120,10 +212,61 @@ const Leads = () => {
 
   const handleUpdate = async (id) => {
     try {
-      await leadService.updateLead(id, formData)
+      const previousLead = leads.find(lead => lead.id === id)
+      const updatedLead = await leadService.updateLead(id, formData)
       setLeads(leads.map(lead => 
         lead.id === id ? { ...lead, ...formData } : lead
       ))
+      
+      // If lead is being converted to "converted" status, create a pending sale
+      if (previousLead.status !== 'converted' && formData.status === 'converted') {
+        console.log('Converting lead to sale:', previousLead)
+        
+        // Add conversion date to the lead data
+        const conversionDate = new Date().toISOString().split('T')[0]
+        const updatedLeadWithConversion = {
+          ...formData,
+          conversion_date: conversionDate
+        }
+        
+        // Update the lead with conversion date
+        await leadService.updateLead(id, updatedLeadWithConversion)
+        
+        const pendingSale = {
+          customer: previousLead.name,
+          product: 'Product/Service', // Default product, can be updated later
+          amount: previousLead.value || '0', // Use lead value as initial amount
+          date: new Date().toISOString().split('T')[0],
+          status: 'Pending'
+        }
+        
+        console.log('Creating pending sale:', pendingSale)
+        
+        // Save to sales localStorage
+        const existingSales = JSON.parse(localStorage.getItem('crm_sales') || '[]')
+        const newSale = {
+          id: Date.now().toString(),
+          ...pendingSale,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }
+        existingSales.unshift(newSale)
+        localStorage.setItem('crm_sales', JSON.stringify(existingSales))
+        
+        console.log('Saved to localStorage. Total sales:', existingSales.length)
+        
+        // Show success message
+        alert(`Lead "${previousLead.name}" has been converted and added to pending sales!`)
+        
+        // Trigger a custom event to notify sales page to refresh
+        window.dispatchEvent(new CustomEvent('salesDataUpdated', { detail: { sale: newSale } }))
+        
+        // Update local leads state to include conversion date
+        setLeads(leads.map(lead => 
+          lead.id === id ? { ...lead, ...updatedLeadWithConversion } : lead
+        ))
+      }
+      
       setEditingLead(null)
       setFormData({
         name: '',
@@ -140,8 +283,7 @@ const Leads = () => {
         last_contacted: ''
       })
     } catch (error) {
-      setError('Failed to update lead')
-      console.error('Error:', error)
+      console.error('Error updating lead:', error)
     }
   }
 
@@ -229,22 +371,89 @@ const Leads = () => {
     })).sort((a, b) => b.conversionRate - a.conversionRate)
 
     // Time to conversion calculation
+    console.log('=== DEBUGGING LEADS DATA ===')
+    console.log('Total leads:', leads.length)
+    console.log('Leads data:', leads)
+    
     const convertedLeads = leads.filter(lead => lead.status === 'converted')
+    console.log('Converted leads:', convertedLeads.length)
+    console.log('Converted leads data:', convertedLeads)
+    
     const timeToConversion = convertedLeads.map(lead => {
-      const created = new Date(lead.created_date || Date.now())
-      const now = new Date()
-      const daysDiff = Math.floor((now - created) / (1000 * 60 * 60 * 24))
-      return daysDiff
+      console.log('Processing lead:', lead.name, 'Status:', lead.status)
+      console.log('Lead created_date:', lead.created_date)
+      console.log('Lead conversion_date:', lead.conversion_date)
+      console.log('Lead last_contacted:', lead.last_contacted)
+      
+      // Try different date fields that might exist
+      const created = lead.created_date ? new Date(lead.created_date) : 
+                     lead.created_at ? new Date(lead.created_at) : 
+                     lead.date ? new Date(lead.date) : 
+                     new Date()
+      
+      console.log('Created date parsed:', created)
+      
+      // Use conversion_date if available, otherwise estimate with last_contacted
+      const convertedDate = lead.conversion_date 
+        ? new Date(lead.conversion_date)
+        : lead.last_contacted 
+          ? new Date(lead.last_contacted)
+          : new Date()
+      
+      console.log('Converted date parsed:', convertedDate)
+      
+      const timeDiffMs = convertedDate - created
+      const timeDiffHours = timeDiffMs / (1000 * 60 * 60)
+      const timeDiffDays = timeDiffHours / 24
+      
+      console.log('Time diff ms:', timeDiffMs)
+      console.log('Time diff hours:', timeDiffHours)
+      console.log('Time diff days:', timeDiffDays)
+      
+      const displayText = timeDiffDays >= 1 
+        ? `${timeDiffDays.toFixed(1)} days`
+        : timeDiffHours >= 1
+          ? `${timeDiffHours.toFixed(1)} hours`
+          : `${(timeDiffHours * 60).toFixed(0)} minutes`
+      
+      console.log('Display text:', displayText)
+      
+      return {
+        leadName: lead.name,
+        createdDate: created.toLocaleString(),
+        convertedDate: convertedDate.toLocaleString(),
+        timeDiffMs: timeDiffMs,
+        totalHours: timeDiffHours,
+        totalDays: timeDiffDays,
+        displayText: displayText
+      }
     })
     
     const avgTimeToConversion = timeToConversion.length > 0 
-      ? (timeToConversion.reduce((sum, time) => sum + time, 0) / timeToConversion.length).toFixed(1)
+      ? timeToConversion.reduce((sum, time) => sum + time.totalHours, 0) / timeToConversion.length
       : 0
+    
+    console.log('Average hours:', avgTimeToConversion)
+    
+    // Format average time for display
+    let avgTimeDisplay = '0.0 hours'
+    if (avgTimeToConversion > 0) {
+      if (avgTimeToConversion >= 24) {
+        avgTimeDisplay = `${(avgTimeToConversion / 24).toFixed(1)}`
+      } else if (avgTimeToConversion >= 1) {
+        avgTimeDisplay = `${avgTimeToConversion.toFixed(1)} hours`
+      } else {
+        avgTimeDisplay = `${(avgTimeToConversion * 60).toFixed(0)} minutes`
+      }
+    }
+    
+    console.log('Final avg display:', avgTimeDisplay)
+    console.log('===============================')
 
     return {
       conversionFunnel,
       sourceStats,
-      avgTimeToConversion,
+      avgTimeToConversion: avgTimeDisplay,
       totalLeads,
       conversionRate: totalLeads > 0 ? (statusCounts.converted / totalLeads * 100).toFixed(1) : 0
     }
@@ -464,48 +673,6 @@ const Leads = () => {
 
       {showAnalytics && (
         <div className="mb-8 space-y-6">
-          {/* Analytics Overview Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="bg-blue-500 p-3 rounded-lg">
-                  <Activity className="text-white" size={24} />
-                </div>
-                <div className="text-sm text-blue-600 font-medium">
-                  {analytics.conversionRate}%
-                </div>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-800">{analytics.totalLeads}</h3>
-              <p className="text-gray-600 text-sm mt-1">Total Leads</p>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="bg-green-500 p-3 rounded-lg">
-                  <TrendingUp className="text-white" size={24} />
-                </div>
-                <div className="text-sm text-green-600 font-medium">
-                  {analytics.conversionRate}%
-                </div>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-800">{analytics.conversionRate}%</h3>
-              <p className="text-gray-600 text-sm mt-1">Conversion Rate</p>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="bg-purple-500 p-3 rounded-lg">
-                  <Clock className="text-white" size={24} />
-                </div>
-                <div className="text-sm text-purple-600 font-medium">
-                  Days
-                </div>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-800">{analytics.avgTimeToConversion}</h3>
-              <p className="text-gray-600 text-sm mt-1">Avg Time to Convert</p>
-            </div>
-          </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Lead Conversion Funnel */}
             <div className="bg-white rounded-xl shadow-sm p-6">
@@ -589,6 +756,47 @@ const Leads = () => {
                 <X size={20} className="text-gray-500" />
               </button>
             </div>
+
+            {/* Customer Selection Dropdown */}
+            <div className="mb-6 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 shadow-sm">
+              <div className="flex items-center mb-3">
+                <div className="bg-green-600 p-2 rounded-lg mr-3">
+                  <UserPlus size={18} className="text-white" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-green-900">
+                    Quick Fill from Existing Customer
+                  </label>
+                  <p className="text-xs text-green-700 mt-1">Select a customer to auto-fill their information</p>
+                </div>
+              </div>
+              <div className="relative">
+                <select
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      autoFillFromExistingCustomer(e.target.value)
+                    }
+                  }}
+                  className="w-full px-4 py-3 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-sm font-medium appearance-none cursor-pointer hover:border-green-400 transition-colors"
+                >
+                  <option value="">👤 Choose existing customer to auto-fill...</option>
+                  {getAllCustomersFromStorage().map((customer, index) => (
+                    <option key={index} value={customer.email} className="py-2">
+                      {customer.name} • {customer.email} • {customer.company || 'No Company'}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+              <div className="mt-3 flex items-center text-xs text-green-700">
+                <div className="w-2 h-2 bg-green-600 rounded-full mr-2"></div>
+                <span>Customers are automatically saved when you add them to any form</span>
+              </div>
+            </div>
             <form onSubmit={handleAddLead} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
@@ -634,15 +842,49 @@ const Leads = () => {
                 />
               </div>
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                <div className="relative">
+                  <select
+                    value={formData.location || ''}
+                    onChange={(e) => setFormData({...formData, location: e.target.value})}
+                    className="w-full px-4 py-3 pr-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-green-400 transition-colors duration-200"
+                  >
+                    <option value="">📍 Select a state...</option>
+                    {indianStates.map((state, index) => (
+                      <option key={index} value={state} className="text-gray-700">
+                        {state}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 9l6 6m0 0l6-6" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Value</label>
-                <input
-                  type="text"
-                  value={formData.value}
-                  onChange={(e) => setFormData({...formData, value: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="₹0"
-                  pattern="₹?[$]?[0-9]+([,.][0-9]{1,2})?"
-                />
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <IndianRupee size={16} className="text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    value={formData.value}
+                    onChange={(e) => {
+                      const formatted = formatIndianCurrencyInput(e.target.value);
+                      setFormData({...formData, value: formatted});
+                    }}
+                    onBlur={(e) => {
+                      const parsed = parseIndianCurrency(e.target.value);
+                      setFormData({...formData, value: parsed.toString()});
+                    }}
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    placeholder="0"
+                    min="0"
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Lead Score (0-100)</label>
@@ -650,40 +892,77 @@ const Leads = () => {
                   type="number"
                   min="0"
                   max="100"
-                  required
-                  value={formData.score}
-                  onChange={(e) => setFormData({...formData, score: parseInt(e.target.value) || 50})}
+                  value={formData.score === 50 ? '' : formData.score}
+                  onChange={(e) => {
+                    // Prevent backspace from deleting the first digit
+                    const value = e.target.value
+                    if (value.length === 1 && e.key === 'Backspace') {
+                      e.preventDefault()
+                      return
+                    }
+                    // Only allow numbers 0-100
+                    const numValue = parseInt(value) || 0
+                    if (numValue < 0 || numValue > 100) {
+                      e.target.value = numValue < 0 ? 0 : numValue > 100 ? 100 : numValue
+                    } else {
+                      e.target.value = value
+                    }
+                    setFormData({...formData, score: e.target.value || 50})
+                  }}
+                  onKeyDown={(e) => {
+                    // Prevent backspace from deleting the first digit when field is empty or has only one digit
+                    const value = e.target.value
+                    if (e.key === 'Backspace' && value.length === 1) {
+                      e.preventDefault()
+                      return
+                    }
+                  }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  placeholder="Enter score (0-100)"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <select
-                  value={formData.status}
-                  onChange={(e) => setFormData({...formData, status: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value="new">New</option>
-                  <option value="contacted">Contacted</option>
-                  <option value="qualified">Qualified</option>
-                  <option value="converted">Converted</option>
-                  <option value="lost">Lost</option>
-                </select>
+                <div className="relative">
+                  <select
+                    value={formData.status}
+                    onChange={(e) => setFormData({...formData, status: e.target.value})}
+                    className="w-full px-4 py-3 pr-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-green-400 transition-colors duration-200"
+                  >
+                    <option value="new">🆕 New</option>
+                    <option value="contacted">📞 Contacted</option>
+                    <option value="qualified">⭐ Qualified</option>
+                    <option value="converted">✅ Converted</option>
+                    <option value="lost">❌ Lost</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 9l6 6m0 0l6-6" />
+                    </svg>
+                  </div>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Source</label>
-                <select
-                  value={formData.source}
-                  onChange={(e) => setFormData({...formData, source: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value="Website">Website</option>
-                  <option value="Email">Email</option>
-                  <option value="Social Media">Social Media</option>
-                  <option value="Referral">Referral</option>
-                  <option value="Cold Call">Cold Call</option>
-                  <option value="Other">Other</option>
-                </select>
+                <div className="relative">
+                  <select
+                    value={formData.source}
+                    onChange={(e) => setFormData({...formData, source: e.target.value})}
+                    className="w-full px-4 py-3 pr-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-green-400 transition-colors duration-200"
+                  >
+                    <option value="Website">🌐 Website</option>
+                    <option value="Email">📧 Email</option>
+                    <option value="Social Media">📱 Social Media</option>
+                    <option value="Referral">👥 Referral</option>
+                    <option value="Cold Call">📞 Cold Call</option>
+                    <option value="Other">📝 Other</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 9l6 6m0 0l6-6" />
+                    </svg>
+                  </div>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Assigned To</label>
@@ -696,12 +975,68 @@ const Leads = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Created Date</label>
-                <input
-                  type="date"
-                  value={formData.created_date}
-                  onChange={(e) => setFormData({...formData, created_date: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
+                <div className="grid grid-cols-4 gap-2">
+                  <div>
+                    <select
+                      value={new Date(formData.created_date).getMonth() + 1}
+                      onChange={(e) => {
+                        const month = e.target.value
+                        const day = new Date(formData.created_date).getDate()
+                        const year = new Date(formData.created_date).getFullYear()
+                        const newDate = new Date(year, month - 1, day).toISOString().split('T')[0]
+                        setFormData({...formData, created_date: newDate})
+                      }}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-green-400 transition-colors duration-200"
+                    >
+                      <option value="">Month</option>
+                      {months.map((month, index) => (
+                        <option key={index} value={index + 1}>
+                          {month}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <select
+                      value={new Date(formData.created_date).getDate()}
+                      onChange={(e) => {
+                        const day = e.target.value
+                        const month = new Date(formData.created_date).getMonth() + 1
+                        const year = new Date(formData.created_date).getFullYear()
+                        const newDate = new Date(year, month - 1, day).toISOString().split('T')[0]
+                        setFormData({...formData, created_date: newDate})
+                      }}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-green-400 transition-colors duration-200"
+                    >
+                      <option value="">Day</option>
+                      {days.map((day, index) => (
+                        <option key={index} value={day}>
+                          {day}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <select
+                      value={new Date(formData.created_date).getFullYear()}
+                      onChange={(e) => {
+                        const year = e.target.value
+                        const month = new Date(formData.created_date).getMonth() + 1
+                        const day = new Date(formData.created_date).getDate()
+                        const newDate = new Date(year, month - 1, day).toISOString().split('T')[0]
+                        setFormData({...formData, created_date: newDate})
+                      }}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-green-400 transition-colors duration-200"
+                    >
+                      <option value="">Year</option>
+                      {years.map((year, index) => (
+                        <option key={index} value={year}>
+                          {year}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
               </div>
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
@@ -935,7 +1270,7 @@ const Leads = () => {
                       ) : (
                         <div className="text-sm font-medium text-gray-900 flex items-center">
                           <IndianRupee size={14} className="mr-1 text-gray-400" />
-                          {lead.value || '₹0'}
+                          {formatIndianCurrency(lead.value)}
                         </div>
                       )}
                     </td>
