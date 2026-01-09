@@ -430,6 +430,7 @@ const Sales = () => {
           <button 
             onClick={() => setShowAddForm(!showAddForm)}
             className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center"
+            data-add-sale-btn
           >
             <Plus size={20} className="mr-2" />
             Add Sale

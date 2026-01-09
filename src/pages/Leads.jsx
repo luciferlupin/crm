@@ -658,6 +658,7 @@ const Leads = () => {
           <button 
             onClick={() => setShowAddForm(true)}
             className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center"
+            data-add-lead-btn
           >
             <Plus size={20} className="mr-2" />
             Add Lead

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { 
   Users, 
   TrendingUp, 
@@ -33,6 +34,7 @@ import { taskService } from '../services/taskService.js'
 import { salesService } from '../services/salesService.js'
 
 const Dashboard = () => {
+  const navigate = useNavigate()
   const [stats, setStats] = useState([])
   const [analytics, setAnalytics] = useState({})
   const [alerts, setAlerts] = useState([])
@@ -329,27 +331,39 @@ const Dashboard = () => {
 
   // Navigation functions for quick actions
   const handleAddLead = () => {
-    // Navigate to leads page with add form open
-    window.location.href = '/leads#add'
+    // Navigate to leads page
+    navigate('/leads')
+    // Trigger add form after navigation
+    setTimeout(() => {
+      const addLeadBtn = document.querySelector('[data-add-lead-btn]')
+      if (addLeadBtn) {
+        addLeadBtn.click()
+      }
+    }, 100)
   }
 
   const handleCreateSale = () => {
-    // Navigate to sales page with add form open
-    window.location.href = '/sales#add'
+    // Navigate to sales page
+    navigate('/sales')
+    // Trigger add form after navigation
+    setTimeout(() => {
+      const addSaleBtn = document.querySelector('[data-add-sale-btn]')
+      if (addSaleBtn) {
+        addSaleBtn.click()
+      }
+    }, 100)
   }
 
   const handleAddTask = () => {
-    // Navigate to tasks page with add form open
-    window.location.href = '/tasks#add'
-  }
-
-  // Alternative: Use React Router if available
-  const navigateToPage = (page, action) => {
-    // This would work with React Router
-    // navigate(`/${page}#${action}`)
-    
-    // For now, use window.location
-    window.location.href = `/${page}#${action}`
+    // Navigate to tasks page
+    navigate('/tasks')
+    // Trigger add form after navigation
+    setTimeout(() => {
+      const addTaskBtn = document.querySelector('[data-add-task-btn]')
+      if (addTaskBtn) {
+        addTaskBtn.click()
+      }
+    }, 100)
   }
 
   if (loading) {

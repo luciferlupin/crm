@@ -244,8 +244,9 @@ const Tasks = () => {
         </div>
         <div className="flex gap-2">
           <button 
-            onClick={() => setShowAddForm(!showAddForm)}
+            onClick={() => setShowAddForm(true)}
             className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center"
+            data-add-task-btn
           >
             <Plus size={20} className="mr-2" />
             Add Task
