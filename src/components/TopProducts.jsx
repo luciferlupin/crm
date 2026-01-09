@@ -105,7 +105,7 @@ const TopProducts = () => {
               borderRadius: '8px'
             }}
             formatter={(value, name) => {
-              if (name === 'sales') return [`$${value.toLocaleString()}`, 'Revenue']
+              if (name === 'sales') return [`₹${value.toLocaleString('en-IN')}`, 'Revenue']
               return [value, 'Units Sold']
             }}
           />

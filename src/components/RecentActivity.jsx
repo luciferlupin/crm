@@ -129,7 +129,7 @@ const RecentActivity = () => {
           id: `sale-${sale.id}`,
           type: 'sale',
           title: 'New sale recorded',
-          description: `$${parseFloat(sale.amount).toLocaleString()} from ${sale.customer}`,
+          description: `₹${parseFloat(sale.amount).toLocaleString('en-IN')} from ${sale.customer}`,
           time: timeAgo,
           icon: ShoppingCart,
           color: 'bg-green-100 text-green-600',
