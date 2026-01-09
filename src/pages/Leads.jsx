@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Plus, Search, Filter, Target, Clock, CheckCircle, XCircle, X } from 'lucide-react'
+import { Plus, Search, Filter, Target, Clock, CheckCircle, XCircle, X, Edit2, Save, Phone, Mail, Building, Calendar, TrendingUp, User, DollarSign, BarChart3, PieChart, Activity, MessageSquare, Video, Settings, ExternalLink, History, MessageCircle } from 'lucide-react'
 import { leadService } from '../services/leadService.js'
 
 const Leads = () => {
@@ -9,7 +9,23 @@ const Leads = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [showAddForm, setShowAddForm] = useState(false)
-  const [newLead, setNewLead] = useState({
+  const [editingLead, setEditingLead] = useState(null)
+  const [showAnalytics, setShowAnalytics] = useState(false)
+  const [selectedLead, setSelectedLead] = useState(null)
+  const [showActivityModal, setShowActivityModal] = useState(false)
+  const [showCalendlyModal, setShowCalendlyModal] = useState(false)
+  const [showCRMModal, setShowCRMModal] = useState(false)
+  const [showWhatsAppModal, setShowWhatsAppModal] = useState(false)
+  const [whatsappMessage, setWhatsappMessage] = useState('')
+  const [activities, setActivities] = useState([])
+  const [activityForm, setActivityForm] = useState({
+    type: 'call',
+    description: '',
+    date: new Date().toISOString().slice(0, 16),
+    duration: '',
+    outcome: ''
+  })
+  const [formData, setFormData] = useState({
     name: '',
     email: '',
     company: '',
@@ -18,7 +34,10 @@ const Leads = () => {
     source: 'Website',
     value: '',
     score: 50,
-    assigned_to: ''
+    assigned_to: '',
+    notes: '',
+    created_date: new Date().toISOString().split('T')[0],
+    last_contacted: ''
   })
 
   useEffect(() => {
@@ -40,9 +59,27 @@ const Leads = () => {
 
   const handleAddLead = async (e) => {
     e.preventDefault()
+    
+    // Basic validation
+    if (!formData.name.trim()) {
+      alert('Name is required')
+      return
+    }
+    
+    if (!formData.email.trim()) {
+      alert('Email is required')
+      return
+    }
+    
+    if (!formData.email.includes('@')) {
+      alert('Please enter a valid email address')
+      return
+    }
+    
     try {
-      await leadService.insertLead(newLead)
-      setNewLead({
+      const newLead = await leadService.insertLead(formData)
+      setLeads([newLead, ...leads])
+      setFormData({
         name: '',
         email: '',
         company: '',
@@ -51,14 +88,297 @@ const Leads = () => {
         source: 'Website',
         value: '',
         score: 50,
-        assigned_to: ''
+        assigned_to: '',
+        notes: '',
+        created_date: new Date().toISOString().split('T')[0],
+        last_contacted: ''
       })
       setShowAddForm(false)
-      fetchLeads()
     } catch (error) {
       setError('Failed to add lead')
       console.error('Error:', error)
     }
+  }
+
+  const handleEdit = (lead) => {
+    setEditingLead(lead.id)
+    setFormData({
+      name: lead.name,
+      email: lead.email,
+      company: lead.company,
+      phone: lead.phone,
+      status: lead.status,
+      source: lead.source,
+      value: lead.value,
+      score: lead.score,
+      assigned_to: lead.assigned_to,
+      notes: lead.notes || '',
+      created_date: lead.created_date || new Date().toISOString().split('T')[0],
+      last_contacted: lead.last_contacted || ''
+    })
+  }
+
+  const handleUpdate = async (id) => {
+    try {
+      await leadService.updateLead(id, formData)
+      setLeads(leads.map(lead => 
+        lead.id === id ? { ...lead, ...formData } : lead
+      ))
+      setEditingLead(null)
+      setFormData({
+        name: '',
+        email: '',
+        company: '',
+        phone: '',
+        status: 'new',
+        source: 'Website',
+        value: '',
+        score: 50,
+        assigned_to: '',
+        notes: '',
+        created_date: new Date().toISOString().split('T')[0],
+        last_contacted: ''
+      })
+    } catch (error) {
+      setError('Failed to update lead')
+      console.error('Error:', error)
+    }
+  }
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this lead?')) {
+      try {
+        await leadService.deleteLead(id)
+        setLeads(leads.filter(lead => lead.id !== id))
+      } catch (error) {
+        setError('Failed to delete lead')
+        console.error('Error:', error)
+      }
+    }
+  }
+
+  const cancelEdit = () => {
+    setEditingLead(null)
+    setFormData({
+      name: '',
+      email: '',
+      company: '',
+      phone: '',
+      status: 'new',
+      source: 'Website',
+      value: '',
+      score: 50,
+      assigned_to: '',
+      notes: '',
+      created_date: new Date().toISOString().split('T')[0],
+      last_contacted: ''
+    })
+  }
+
+  const updateLeadStatus = async (id, newStatus) => {
+    try {
+      await leadService.updateLead(id, { status: newStatus })
+      setLeads(leads.map(lead => 
+        lead.id === id ? { ...lead, status: newStatus } : lead
+      ))
+    } catch (error) {
+      setError('Failed to update lead status')
+      console.error('Error:', error)
+    }
+  }
+
+  // Analytics calculations
+  const calculateAnalytics = () => {
+    const statusCounts = {
+      new: leads.filter(l => l.status === 'new').length,
+      contacted: leads.filter(l => l.status === 'contacted').length,
+      qualified: leads.filter(l => l.status === 'qualified').length,
+      converted: leads.filter(l => l.status === 'converted').length,
+      lost: leads.filter(l => l.status === 'lost').length
+    }
+
+    const totalLeads = leads.length
+    const conversionFunnel = [
+      { stage: 'New', count: statusCounts.new, percentage: totalLeads > 0 ? (statusCounts.new / totalLeads * 100).toFixed(1) : 0 },
+      { stage: 'Contacted', count: statusCounts.contacted, percentage: totalLeads > 0 ? (statusCounts.contacted / totalLeads * 100).toFixed(1) : 0 },
+      { stage: 'Qualified', count: statusCounts.qualified, percentage: totalLeads > 0 ? (statusCounts.qualified / totalLeads * 100).toFixed(1) : 0 },
+      { stage: 'Converted', count: statusCounts.converted, percentage: totalLeads > 0 ? (statusCounts.converted / totalLeads * 100).toFixed(1) : 0 }
+    ]
+
+    // Lead source performance
+    const sourcePerformance = leads.reduce((acc, lead) => {
+      const source = lead.source || 'Unknown'
+      if (!acc[source]) {
+        acc[source] = { total: 0, converted: 0, value: 0 }
+      }
+      acc[source].total++
+      if (lead.status === 'converted') {
+        acc[source].converted++
+      }
+      const value = parseFloat(lead.value?.replace(/[^0-9.-]/g, '')) || 0
+      acc[source].value += value
+      return acc
+    }, {})
+
+    const sourceStats = Object.entries(sourcePerformance).map(([source, data]) => ({
+      source,
+      total: data.total,
+      converted: data.converted,
+      conversionRate: data.total > 0 ? (data.converted / data.total * 100).toFixed(1) : 0,
+      totalValue: data.value
+    })).sort((a, b) => b.conversionRate - a.conversionRate)
+
+    // Time to conversion calculation
+    const convertedLeads = leads.filter(lead => lead.status === 'converted')
+    const timeToConversion = convertedLeads.map(lead => {
+      const created = new Date(lead.created_date || Date.now())
+      const now = new Date()
+      const daysDiff = Math.floor((now - created) / (1000 * 60 * 60 * 24))
+      return daysDiff
+    })
+    
+    const avgTimeToConversion = timeToConversion.length > 0 
+      ? (timeToConversion.reduce((sum, time) => sum + time, 0) / timeToConversion.length).toFixed(1)
+      : 0
+
+    return {
+      conversionFunnel,
+      sourceStats,
+      avgTimeToConversion,
+      totalLeads,
+      conversionRate: totalLeads > 0 ? (statusCounts.converted / totalLeads * 100).toFixed(1) : 0
+    }
+  }
+
+  const analytics = calculateAnalytics()
+
+  // Activity Timeline Functions
+  const handleAddActivity = async () => {
+    if (!selectedLead) return
+    
+    try {
+      const newActivity = {
+        id: Date.now(),
+        leadId: selectedLead.id,
+        ...activityForm,
+        createdAt: new Date().toISOString()
+      }
+      
+      setActivities([...activities, newActivity])
+      
+      // Update last contacted date for the lead
+      await leadService.updateLead(selectedLead.id, { 
+        last_contacted: new Date().toISOString().split('T')[0] 
+      })
+      
+      setLeads(leads.map(lead => 
+        lead.id === selectedLead.id 
+          ? { ...lead, last_contacted: new Date().toISOString().split('T')[0] }
+          : lead
+      ))
+      
+      setActivityForm({
+        type: 'call',
+        description: '',
+        date: new Date().toISOString().slice(0, 16),
+        duration: '',
+        outcome: ''
+      })
+      setShowActivityModal(false)
+    } catch (error) {
+      setError('Failed to add activity')
+      console.error('Error:', error)
+    }
+  }
+
+  const handleSendWhatsAppMessage = () => {
+    if (!selectedLead || !selectedLead.phone) {
+      alert('Phone number is required to send WhatsApp message')
+      return
+    }
+    
+    if (!whatsappMessage.trim()) {
+      alert('Please enter a message to send')
+      return
+    }
+    
+    // Clean and format phone number for WhatsApp
+    let cleanPhone = selectedLead.phone.replace(/[\s\-\(\)]/g, '')
+    
+    // Handle Indian phone numbers
+    if (cleanPhone.startsWith('+91')) {
+      cleanPhone = cleanPhone.substring(3)
+    } else if (cleanPhone.startsWith('91') && cleanPhone.length === 12) {
+      cleanPhone = cleanPhone.substring(2)
+    } else if (cleanPhone.startsWith('0')) {
+      cleanPhone = cleanPhone.substring(1)
+    }
+    
+    // Ensure we have a valid 10-digit number for India
+    if (cleanPhone.length !== 10) {
+      alert('Invalid phone number format. Please ensure it\'s a valid 10-digit Indian mobile number.')
+      return
+    }
+    
+    // Create WhatsApp URL with Indian country code
+    const whatsappUrl = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(whatsappMessage)}`
+    
+    // Open WhatsApp with message
+    window.open(whatsappUrl, '_blank')
+    setShowWhatsAppModal(false)
+    setWhatsappMessage('')
+  }
+
+  const setMessageSuggestion = (message) => {
+    setWhatsappMessage(message)
+  }
+
+  const handleCRMIntegration = async (crmType) => {
+    if (!selectedLead) return
+    
+    try {
+      // Mock CRM integration - in real implementation, this would connect to actual CRM APIs
+      const crmData = {
+        lead: selectedLead,
+        activities: activities.filter(a => a.leadId === selectedLead.id),
+        crmType,
+        timestamp: new Date().toISOString()
+      }
+      
+      console.log(`Syncing lead ${selectedLead.id} to ${crmType}:`, crmData)
+      
+      // Store integration status
+      localStorage.setItem(`crm_sync_${selectedLead.id}_${crmType}`, JSON.stringify({
+        synced: true,
+        timestamp: crmData.timestamp
+      }))
+      
+      setShowCRMModal(false)
+      alert(`Lead successfully synced to ${crmType}!`)
+    } catch (error) {
+      setError(`Failed to sync to ${crmType}`)
+      console.error('Error:', error)
+    }
+  }
+
+  const getLeadActivities = (leadId) => {
+    return activities.filter(activity => activity.leadId === leadId)
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+  }
+
+  const getActivityIcon = (type) => {
+    switch (type) {
+      case 'call': return <Phone size={16} className="text-blue-500" />
+      case 'email': return <Mail size={16} className="text-green-500" />
+      case 'meeting': return <Video size={16} className="text-purple-500" />
+      case 'note': return <MessageSquare size={16} className="text-yellow-500" />
+      default: return <Activity size={16} className="text-gray-500" />
+    }
+  }
+
+  const getCRMIntegrationStatus = (leadId, crmType) => {
+    const syncData = localStorage.getItem(`crm_sync_${leadId}_${crmType}`)
+    return syncData ? JSON.parse(syncData) : { synced: false }
   }
 
   const filteredLeads = leads.filter(lead => {
@@ -114,13 +434,26 @@ const Leads = () => {
           <h1 className="text-3xl font-bold text-gray-800">Leads</h1>
           <p className="text-gray-600 mt-2">Track and manage your sales pipeline</p>
         </div>
-        <button 
-          onClick={() => setShowAddForm(true)}
-          className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center"
-        >
-          <Plus size={20} className="mr-2" />
-          Add Lead
-        </button>
+        <div className="flex gap-3">
+          <button 
+            onClick={() => setShowAnalytics(!showAnalytics)}
+            className={`px-4 py-2 rounded-lg transition-colors flex items-center ${
+              showAnalytics 
+                ? 'bg-primary-600 text-white hover:bg-primary-700' 
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            <BarChart3 size={20} className="mr-2" />
+            {showAnalytics ? 'Hide Analytics' : 'Show Analytics'}
+          </button>
+          <button 
+            onClick={() => setShowAddForm(true)}
+            className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center"
+          >
+            <Plus size={20} className="mr-2" />
+            Add Lead
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -129,65 +462,258 @@ const Leads = () => {
         </div>
       )}
 
+      {showAnalytics && (
+        <div className="mb-8 space-y-6">
+          {/* Analytics Overview Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="bg-blue-500 p-3 rounded-lg">
+                  <Activity className="text-white" size={24} />
+                </div>
+                <div className="text-sm text-blue-600 font-medium">
+                  {analytics.conversionRate}%
+                </div>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800">{analytics.totalLeads}</h3>
+              <p className="text-gray-600 text-sm mt-1">Total Leads</p>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="bg-green-500 p-3 rounded-lg">
+                  <TrendingUp className="text-white" size={24} />
+                </div>
+                <div className="text-sm text-green-600 font-medium">
+                  {analytics.conversionRate}%
+                </div>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800">{analytics.conversionRate}%</h3>
+              <p className="text-gray-600 text-sm mt-1">Conversion Rate</p>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="bg-purple-500 p-3 rounded-lg">
+                  <Clock className="text-white" size={24} />
+                </div>
+                <div className="text-sm text-purple-600 font-medium">
+                  Days
+                </div>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800">{analytics.avgTimeToConversion}</h3>
+              <p className="text-gray-600 text-sm mt-1">Avg Time to Convert</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Lead Conversion Funnel */}
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+                <BarChart3 size={20} className="mr-2 text-blue-600" />
+                Lead Conversion Funnel
+              </h2>
+              <div className="space-y-4">
+                {analytics.conversionFunnel.map((stage, index) => (
+                  <div key={stage.stage} className="relative">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium text-gray-700">{stage.stage}</span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm text-gray-600">{stage.count} leads</span>
+                        <span className="text-sm font-semibold text-blue-600">{stage.percentage}%</span>
+                      </div>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-8 relative overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-500 flex items-center justify-end pr-3"
+                        style={{ width: `${stage.percentage}%` }}
+                      >
+                        {stage.percentage > 10 && (
+                          <span className="text-white text-xs font-medium">{stage.percentage}%</span>
+                        )}
+                      </div>
+                    </div>
+                    {index < analytics.conversionFunnel.length - 1 && (
+                      <div className="flex justify-center mt-2">
+                        <div className="text-gray-400">
+                          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Lead Source Performance */}
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+                <PieChart size={20} className="mr-2 text-green-600" />
+                Lead Source Performance
+              </h2>
+              <div className="space-y-3">
+                {analytics.sourceStats.slice(0, 5).map((source, index) => (
+                  <div key={source.source} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center flex-1">
+                      <div className={`w-3 h-3 rounded-full mr-3 ${
+                        index === 0 ? 'bg-green-500' :
+                        index === 1 ? 'bg-blue-500' :
+                        index === 2 ? 'bg-yellow-500' :
+                        index === 3 ? 'bg-purple-500' : 'bg-gray-500'
+                      }`} />
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">{source.source}</div>
+                        <div className="text-xs text-gray-500">{source.total} leads</div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-semibold text-green-600">{source.conversionRate}%</div>
+                      <div className="text-xs text-gray-500">{source.converted} converted</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showAddForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Add New Lead</h2>
               <button onClick={() => setShowAddForm(false)}>
                 <X size={20} className="text-gray-500" />
               </button>
             </div>
-            <form onSubmit={handleAddLead} className="space-y-4">
+            <form onSubmit={handleAddLead} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
                 <input
                   type="text"
                   required
-                  value={newLead.name}
-                  onChange={(e) => setNewLead({...newLead, name: e.target.value})}
+                  value={formData.name}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  placeholder="Enter lead's full name"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
                 <input
                   type="email"
                   required
-                  value={newLead.email}
-                  onChange={(e) => setNewLead({...newLead, email: e.target.value})}
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
-                <input
-                  type="text"
-                  value={newLead.company}
-                  onChange={(e) => setNewLead({...newLead, company: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  placeholder="lead@example.com"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
                 <input
                   type="tel"
-                  value={newLead.phone}
-                  onChange={(e) => setNewLead({...newLead, phone: e.target.value})}
+                  value={formData.phone}
+                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  placeholder="+91 98765 43210"
+                  pattern="[+]?[0-9]{1,4}?[-\s]?[0-9]{1,4}"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
+                <input
+                  type="text"
+                  value={formData.company}
+                  onChange={(e) => setFormData({...formData, company: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  placeholder="Company name"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Value</label>
                 <input
                   type="text"
+                  value={formData.value}
+                  onChange={(e) => setFormData({...formData, value: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="$0"
-                  value={newLead.value}
-                  onChange={(e) => setNewLead({...newLead, value: e.target.value})}
+                  pattern="[$]?[0-9]+([,.][0-9]{1,2})?"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Lead Score (0-100)</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  required
+                  value={formData.score}
+                  onChange={(e) => setFormData({...formData, score: parseInt(e.target.value) || 50})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
               </div>
-              <div className="flex gap-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <select
+                  value={formData.status}
+                  onChange={(e) => setFormData({...formData, status: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                >
+                  <option value="new">New</option>
+                  <option value="contacted">Contacted</option>
+                  <option value="qualified">Qualified</option>
+                  <option value="converted">Converted</option>
+                  <option value="lost">Lost</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Source</label>
+                <select
+                  value={formData.source}
+                  onChange={(e) => setFormData({...formData, source: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                >
+                  <option value="Website">Website</option>
+                  <option value="Email">Email</option>
+                  <option value="Social Media">Social Media</option>
+                  <option value="Referral">Referral</option>
+                  <option value="Cold Call">Cold Call</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Assigned To</label>
+                <input
+                  type="text"
+                  value={formData.assigned_to}
+                  onChange={(e) => setFormData({...formData, assigned_to: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Created Date</label>
+                <input
+                  type="date"
+                  value={formData.created_date}
+                  onChange={(e) => setFormData({...formData, created_date: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                <textarea
+                  value={formData.notes}
+                  onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  rows="3"
+                  placeholder="Additional notes about this lead..."
+                />
+              </div>
+              <div className="md:col-span-2 flex gap-3">
                 <button
                   type="button"
                   onClick={() => setShowAddForm(false)}
@@ -284,7 +810,7 @@ const Leads = () => {
                   Lead
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Company
+                  Company & Source
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
@@ -298,46 +824,435 @@ const Leads = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Assigned To
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Quick Actions
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredLeads.map((lead) => (
-                <tr key={lead.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">{lead.name}</div>
-                      <div className="text-sm text-gray-500">{lead.email}</div>
+              {filteredLeads.length === 0 ? (
+                <tr>
+                  <td colSpan="8" className="px-6 py-12 text-center">
+                    <div className="text-gray-500">
+                      <Target className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                      <p>No leads found</p>
+                      <p className="text-sm mt-1">Add your first lead to get started</p>
                     </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{lead.company}</div>
-                    <div className="text-sm text-gray-500">{lead.source}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      {getStatusIcon(lead.status)}
-                      <span className={`ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(lead.status)}`}>
-                        {lead.status?.charAt(0).toUpperCase() + lead.status?.slice(1)}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className={`text-sm font-medium ${getScoreColor(lead.score)}`}>
-                      {lead.score}/100
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {lead.value}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {lead.assigned_to || 'Unassigned'}
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filteredLeads.map((lead) => (
+                  <tr key={lead.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10 bg-primary-100 rounded-full flex items-center justify-center">
+                          <User className="text-primary-600" size={16} />
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">{lead.name}</div>
+                          <div className="flex items-center text-sm text-gray-500">
+                            <Mail size={12} className="mr-1" />
+                            {lead.email}
+                          </div>
+                          {lead.phone && (
+                            <div className="flex items-center text-sm text-gray-500 mt-1">
+                              <Phone size={12} className="mr-1" />
+                              {lead.phone}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900 flex items-center">
+                        <Building size={14} className="mr-2 text-gray-400" />
+                        {lead.company || 'N/A'}
+                      </div>
+                      <div className="text-sm text-gray-500 mt-1">
+                        Source: {lead.source}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {editingLead === lead.id ? (
+                        <select
+                          value={formData.status}
+                          onChange={(e) => setFormData({...formData, status: e.target.value})}
+                          className="px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                        >
+                          <option value="new">New</option>
+                          <option value="contacted">Contacted</option>
+                          <option value="qualified">Qualified</option>
+                          <option value="converted">Converted</option>
+                          <option value="lost">Lost</option>
+                        </select>
+                      ) : (
+                        <div className="flex items-center space-x-2">
+                          {getStatusIcon(lead.status)}
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(lead.status)}`}>
+                            {lead.status?.charAt(0).toUpperCase() + lead.status?.slice(1)}
+                          </span>
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {editingLead === lead.id ? (
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          value={formData.score}
+                          onChange={(e) => setFormData({...formData, score: parseInt(e.target.value) || 50})}
+                          className="w-16 px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                        />
+                      ) : (
+                        <div className="flex items-center">
+                          <div className={`text-sm font-medium ${getScoreColor(lead.score)}`}>
+                            {lead.score}/100
+                          </div>
+                          <div className="ml-2 w-12 bg-gray-200 rounded-full h-2">
+                            <div 
+                              className={`h-2 rounded-full ${
+                                lead.score >= 80 ? 'bg-green-500' : 
+                                lead.score >= 60 ? 'bg-yellow-500' : 'bg-red-500'
+                              }`}
+                              style={{ width: `${lead.score}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {editingLead === lead.id ? (
+                        <input
+                          type="text"
+                          value={formData.value}
+                          onChange={(e) => setFormData({...formData, value: e.target.value})}
+                          className="w-20 px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                        />
+                      ) : (
+                        <div className="text-sm font-medium text-gray-900 flex items-center">
+                          <DollarSign size={14} className="mr-1 text-gray-400" />
+                          {lead.value || '$0'}
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {editingLead === lead.id ? (
+                        <input
+                          type="text"
+                          value={formData.assigned_to}
+                          onChange={(e) => setFormData({...formData, assigned_to: e.target.value})}
+                          className="w-24 px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                        />
+                      ) : (
+                        <div className="text-sm text-gray-900">
+                          {lead.assigned_to || (
+                            <span className="text-gray-400 italic">Unassigned</span>
+                          )}
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {editingLead === lead.id ? (
+                        <div className="flex space-x-2">
+                          <button 
+                            onClick={() => handleUpdate(lead.id)}
+                            className="text-green-600 hover:text-green-900"
+                            title="Save"
+                          >
+                            <Save size={16} />
+                          </button>
+                          <button 
+                            onClick={cancelEdit}
+                            className="text-gray-600 hover:text-gray-900"
+                            title="Cancel"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex space-x-2">
+                          <button 
+                            onClick={() => handleEdit(lead)}
+                            className="text-blue-600 hover:text-blue-900"
+                            title="Edit"
+                          >
+                            <Edit2 size={16} />
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(lead.id)}
+                            className="text-red-600 hover:text-red-900"
+                            title="Delete"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex space-x-2">
+                        <button 
+                          onClick={() => {
+                            setSelectedLead(lead)
+                            setShowActivityModal(true)
+                          }}
+                          className="text-purple-600 hover:text-purple-900 bg-purple-50 p-2 rounded-lg"
+                          title="Add Activity"
+                        >
+                          <History size={16} />
+                        </button>
+                        <button 
+                          onClick={() => {
+                            setSelectedLead(lead)
+                            setShowWhatsAppModal(true)
+                            setWhatsappMessage('')
+                          }}
+                          className="text-green-600 hover:text-green-900 bg-green-50 p-2 rounded-lg"
+                          title="Send WhatsApp Message"
+                        >
+                          <MessageCircle size={16} />
+                        </button>
+                                              </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </div>
+
+      {/* Activity Timeline Modal */}
+      {showActivityModal && selectedLead && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold flex items-center">
+                <History className="mr-2 text-purple-600" size={24} />
+                Activity Timeline - {selectedLead.name}
+              </h2>
+              <button onClick={() => setShowActivityModal(false)}>
+                <X size={20} className="text-gray-500" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Add New Activity */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h3 className="text-lg font-medium mb-4">Log New Activity</h3>
+                <form onSubmit={(e) => { e.preventDefault(); handleAddActivity(); }} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Activity Type</label>
+                    <select
+                      value={activityForm.type}
+                      onChange={(e) => setActivityForm({...activityForm, type: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    >
+                      <option value="call">Phone Call</option>
+                      <option value="email">Email</option>
+                      <option value="meeting">Meeting</option>
+                      <option value="note">Note</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Date & Time</label>
+                    <input
+                      type="datetime-local"
+                      value={activityForm.date}
+                      onChange={(e) => setActivityForm({...activityForm, date: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Duration (optional)</label>
+                    <input
+                      type="text"
+                      placeholder="30 minutes"
+                      value={activityForm.duration}
+                      onChange={(e) => setActivityForm({...activityForm, duration: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea
+                      required
+                      value={activityForm.description}
+                      onChange={(e) => setActivityForm({...activityForm, description: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      rows="3"
+                      placeholder="Describe the activity..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Outcome</label>
+                    <input
+                      type="text"
+                      value={activityForm.outcome}
+                      onChange={(e) => setActivityForm({...activityForm, outcome: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      placeholder="e.g., Interested, Follow-up needed, Not interested"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="w-full px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+                  >
+                    Log Activity
+                  </button>
+                </form>
+              </div>
+
+              {/* Activity History */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h3 className="text-lg font-medium mb-4">Activity History</h3>
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {getLeadActivities(selectedLead.id).length === 0 ? (
+                    <div className="text-center text-gray-500 py-8">
+                      <History size={48} className="mx-auto mb-4 text-gray-300" />
+                      <p>No activities logged yet</p>
+                      <p className="text-sm mt-1">Start by logging your first interaction</p>
+                    </div>
+                  ) : (
+                    getLeadActivities(selectedLead.id).map((activity) => (
+                      <div key={activity.id} className="bg-white p-3 rounded-lg border border-gray-200">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center">
+                            {getActivityIcon(activity.type)}
+                            <div className="ml-3">
+                              <div className="text-sm font-medium text-gray-900 capitalize">
+                                {activity.type}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {new Date(activity.createdAt).toLocaleString()}
+                              </div>
+                            </div>
+                          </div>
+                          {activity.duration && (
+                            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                              {activity.duration}
+                            </span>
+                          )}
+                        </div>
+                        <div className="mt-2 text-sm text-gray-700">{activity.description}</div>
+                        {activity.outcome && (
+                          <div className="mt-2 text-sm text-gray-600">
+                            <strong>Outcome:</strong> {activity.outcome}
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* WhatsApp Messaging Modal */}
+      {showWhatsAppModal && selectedLead && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold flex items-center">
+                <MessageCircle className="mr-2 text-green-600" size={24} />
+                Send WhatsApp Message - {selectedLead.name}
+              </h2>
+              <button onClick={() => setShowWhatsAppModal(false)}>
+                <X size={20} className="text-gray-500" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Lead Information */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="font-medium text-gray-900 mb-4">Lead Information</h3>
+                <div className="space-y-2 text-sm">
+                  <div><strong>Name:</strong> {selectedLead.name}</div>
+                  <div><strong>Email:</strong> {selectedLead.email}</div>
+                  <div><strong>Phone:</strong> {selectedLead.phone || 'Not provided'}</div>
+                  <div><strong>Company:</strong> {selectedLead.company || 'Not provided'}</div>
+                  <div><strong>Status:</strong> {selectedLead.status}</div>
+                </div>
+              </div>
+
+              {/* Message Composition */}
+              <div className="space-y-4">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="font-medium text-gray-900 mb-4">Compose Message</h3>
+                  
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Your Message
+                    </label>
+                    <textarea
+                      value={whatsappMessage}
+                      onChange={(e) => setWhatsappMessage(e.target.value)}
+                      placeholder="Type your message here..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      rows="4"
+                    />
+                  </div>
+
+                  <button
+                    onClick={handleSendWhatsAppMessage}
+                    disabled={!selectedLead?.phone || !whatsappMessage.trim()}
+                    className={`w-full px-4 py-3 rounded-md flex items-center justify-center ${
+                      selectedLead?.phone && whatsappMessage.trim()
+                        ? 'bg-green-600 text-white hover:bg-green-700' 
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
+                  >
+                    <MessageCircle size={20} className="mr-2" />
+                    Send WhatsApp Message
+                  </button>
+                </div>
+
+                {/* Message Suggestions */}
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <h3 className="font-medium text-blue-900 mb-3">Message Suggestions</h3>
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => setMessageSuggestion(`Hi ${selectedLead.name}! 👋\n\nI'm reaching out from your recent inquiry. I'd love to discuss how we can help your business grow. When would be a good time for a quick call?\n\nBest regards,\n${selectedLead.assigned_to || 'Your Team'}`)}
+                      className="w-full text-left px-3 py-2 bg-white border border-blue-200 rounded-md hover:bg-blue-100 text-sm"
+                    >
+                      📞 Follow-up Call Request
+                    </button>
+                    <button
+                      onClick={() => setMessageSuggestion(`Hi ${selectedLead.name}! 👋\n\nThank you for your interest in our services! I have some great information to share that could really benefit ${selectedLead.company || 'your business'}.\n\nWould you be available for a 15-minute demo this week?\n\nLooking forward to connecting!\n\n${selectedLead.assigned_to || 'Your Team'}`)}
+                      className="w-full text-left px-3 py-2 bg-white border border-blue-200 rounded-md hover:bg-blue-100 text-sm"
+                    >
+                      🎯 Product Demo Request
+                    </button>
+                    <button
+                      onClick={() => setMessageSuggestion(`Hi ${selectedLead.name}! 👋\n\nFollowing up on our previous conversation. I wanted to check if you had any questions about our proposal or if you need any additional information.\n\nI'm here to help make this process as smooth as possible for you.\n\nBest regards,\n${selectedLead.assigned_to || 'Your Team'}`)}
+                      className="w-full text-left px-3 py-2 bg-white border border-blue-200 rounded-md hover:bg-blue-100 text-sm"
+                    >
+                      📋 Follow-up on Proposal
+                    </button>
+                    <button
+                      onClick={() => setMessageSuggestion(`Hi ${selectedLead.name}! 👋\n\nGreat news! I have some exciting updates about our services that I think you'll love. We've recently added some features that could significantly improve ${selectedLead.company || 'your business'} operations.\n\nCan we schedule a quick call to discuss?\n\nBest regards,\n${selectedLead.assigned_to || 'Your Team'}`)}
+                      className="w-full text-left px-3 py-2 bg-white border border-blue-200 rounded-md hover:bg-blue-100 text-sm"
+                    >
+                      🚀 New Features Update
+                    </button>
+                    <button
+                      onClick={() => setMessageSuggestion(`Hi ${selectedLead.name}! 👋\n\nI hope you're having a great week! I wanted to personally reach out and see how things are going on your end.\n\nIs there anything I can help with or any questions I can answer?\n\nAlways here to support you!\n\n${selectedLead.assigned_to || 'Your Team'}`)}
+                      className="w-full text-left px-3 py-2 bg-white border border-blue-200 rounded-md hover:bg-blue-100 text-sm"
+                    >
+                      💬 General Check-in
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

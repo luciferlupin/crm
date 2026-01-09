@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { TrendingUp, DollarSign, ShoppingCart, Users, Calendar, Filter, Plus } from 'lucide-react'
+import { TrendingUp, DollarSign, ShoppingCart, Users, Calendar, Filter, Plus, Edit2, Save, X } from 'lucide-react'
 import SalesChart from '../components/SalesChart.jsx'
 import TopProducts from '../components/TopProducts.jsx'
 import { salesService } from '../services/salesService.js'
@@ -8,6 +8,7 @@ const Sales = () => {
   const [sales, setSales] = useState([])
   const [loading, setLoading] = useState(true)
   const [showAddForm, setShowAddForm] = useState(false)
+  const [editingSale, setEditingSale] = useState(null)
   const [formData, setFormData] = useState({
     customer: '',
     product: '',
@@ -61,15 +62,59 @@ const Sales = () => {
     }
   }
 
+  const handleEdit = (sale) => {
+    setEditingSale(sale.id)
+    setFormData({
+      customer: sale.customer,
+      product: sale.product,
+      amount: sale.amount,
+      date: sale.date,
+      status: sale.status
+    })
+  }
+
+  const handleUpdate = async (id) => {
+    try {
+      await salesService.updateSale(id, formData)
+      setSales(sales.map(sale => 
+        sale.id === id ? { ...sale, ...formData } : sale
+      ))
+      setEditingSale(null)
+      setFormData({
+        customer: '',
+        product: '',
+        amount: '',
+        date: new Date().toISOString().split('T')[0],
+        status: 'Completed'
+      })
+    } catch (error) {
+      console.error('Error updating sale:', error)
+    }
+  }
+
+  const cancelEdit = () => {
+    setEditingSale(null)
+    setFormData({
+      customer: '',
+      product: '',
+      amount: '',
+      date: new Date().toISOString().split('T')[0],
+      status: 'Completed'
+    })
+  }
+
   // Calculate stats from user data
-  const totalRevenue = sales.reduce((sum, sale) => {
+  const completedSales = sales.filter(sale => sale.status === 'Completed')
+  const pendingSales = sales.filter(sale => sale.status === 'Pending')
+  
+  const totalRevenue = completedSales.reduce((sum, sale) => {
     const amount = parseFloat(sale.amount?.replace(/[^0-9.-]/g, '')) || 0
     return sum + amount
   }, 0)
 
   const totalOrders = sales.length
-  const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0
-  const completedSales = sales.filter(sale => sale.status === 'Completed').length
+  const averageOrderValue = completedSales.length > 0 ? totalRevenue / completedSales.length : 0
+  const pendingOrdersCount = pendingSales.length
 
   const stats = [
     {
@@ -80,9 +125,9 @@ const Sales = () => {
       color: 'bg-green-500'
     },
     {
-      title: 'Total Orders',
-      value: totalOrders.toString(),
-      change: totalOrders > 0 ? `+${totalOrders}` : '+0',
+      title: 'Completed Orders',
+      value: completedSales.length.toString(),
+      change: completedSales.length > 0 ? `+${completedSales.length}` : '+0',
       icon: ShoppingCart,
       color: 'bg-blue-500'
     },
@@ -94,9 +139,9 @@ const Sales = () => {
       color: 'bg-purple-500'
     },
     {
-      title: 'Completed Sales',
-      value: completedSales.toString(),
-      change: completedSales > 0 ? `+${completedSales}` : '+0',
+      title: 'Pending Orders',
+      value: pendingOrdersCount.toString(),
+      change: pendingOrdersCount > 0 ? `+${pendingOrdersCount}` : '+0',
       icon: Users,
       color: 'bg-yellow-500'
     }
@@ -278,6 +323,149 @@ const Sales = () => {
                 sales.map((sale) => (
                   <tr key={sale.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {editingSale === sale.id ? (
+                        <input
+                          type="text"
+                          value={formData.customer}
+                          onChange={(e) => setFormData({...formData, customer: e.target.value})}
+                          className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        />
+                      ) : (
+                        sale.customer
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {editingSale === sale.id ? (
+                        <input
+                          type="text"
+                          value={formData.product}
+                          onChange={(e) => setFormData({...formData, product: e.target.value})}
+                          className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        />
+                      ) : (
+                        sale.product
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {editingSale === sale.id ? (
+                        <input
+                          type="number"
+                          value={formData.amount}
+                          onChange={(e) => setFormData({...formData, amount: e.target.value})}
+                          className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        />
+                      ) : (
+                        `$${parseFloat(sale.amount).toLocaleString()}`
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {editingSale === sale.id ? (
+                        <input
+                          type="date"
+                          value={formData.date}
+                          onChange={(e) => setFormData({...formData, date: e.target.value})}
+                          className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        />
+                      ) : (
+                        sale.date
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {editingSale === sale.id ? (
+                        <select
+                          value={formData.status}
+                          onChange={(e) => setFormData({...formData, status: e.target.value})}
+                          className="px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        >
+                          <option value="Completed">Completed</option>
+                          <option value="Pending">Pending</option>
+                          <option value="Cancelled">Cancelled</option>
+                        </select>
+                      ) : (
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          sale.status === 'Completed' 
+                            ? 'bg-green-100 text-green-800' 
+                            : sale.status === 'Pending'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {sale.status}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {editingSale === sale.id ? (
+                        <div className="flex space-x-2">
+                          <button 
+                            onClick={() => handleUpdate(sale.id)}
+                            className="text-green-600 hover:text-green-900"
+                          >
+                            <Save size={16} />
+                          </button>
+                          <button 
+                            onClick={cancelEdit}
+                            className="text-gray-600 hover:text-gray-900"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex space-x-2">
+                          <button 
+                            onClick={() => handleEdit(sale)}
+                            className="text-blue-600 hover:text-blue-900"
+                          >
+                            <Edit2 size={16} />
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(sale.id)}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Pending Orders Section */}
+      {pendingSales.length > 0 && (
+        <div className="mt-8 bg-white rounded-xl shadow-sm">
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-800">Pending Orders</h2>
+            <p className="text-sm text-gray-600 mt-1">Orders awaiting completion</p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Customer
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Product
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Amount
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Date
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {pendingSales.map((sale) => (
+                  <tr key={sale.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {sale.customer}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -289,32 +477,29 @@ const Sales = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {sale.date}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        sale.status === 'Completed' 
-                          ? 'bg-green-100 text-green-800' 
-                          : sale.status === 'Pending'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {sale.status}
-                      </span>
-                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <button 
-                        onClick={() => handleDelete(sale.id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        Delete
-                      </button>
+                      <div className="flex space-x-2">
+                        <button 
+                          onClick={() => handleEdit(sale)}
+                          className="text-blue-600 hover:text-blue-900"
+                        >
+                          <Edit2 size={16} />
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(sale.id)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

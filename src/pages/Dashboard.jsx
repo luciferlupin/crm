@@ -72,8 +72,9 @@ const Dashboard = () => {
         return sum + value
       }, 0)
       
-      // Calculate total revenue from sales
-      const totalRevenue = sales.reduce((sum, sale) => {
+      // Calculate total revenue from completed sales only
+      const completedSales = sales.filter(sale => sale.status === 'Completed')
+      const totalRevenue = completedSales.reduce((sum, sale) => {
         const amount = parseFloat(sale.amount) || 0
         return sum + amount
       }, 0)

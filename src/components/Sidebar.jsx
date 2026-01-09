@@ -8,7 +8,8 @@ import {
   CheckSquare,
   Menu,
   X,
-  LogOut
+  LogOut,
+  Package
 } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext.jsx'
@@ -22,6 +23,7 @@ const Sidebar = () => {
     { name: 'Customers', icon: Users, path: '/customers' },
     { name: 'Leads', icon: Target, path: '/leads' },
     { name: 'Sales', icon: TrendingUp, path: '/sales' },
+    { name: 'Products', icon: Package, path: '/products' },
     { name: 'Tasks', icon: CheckSquare, path: '/tasks' },
   ]
 
@@ -78,8 +80,8 @@ const Sidebar = () => {
               <div className="w-10 h-10 bg-primary-600 rounded-full flex items-center justify-center text-white font-semibold">
                 {user?.email?.charAt(0).toUpperCase() || 'U'}
               </div>
-              <div className="ml-3 flex-1">
-                <p className="text-sm font-medium text-gray-800 truncate">
+              <div className="ml-3 flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-800 truncate" title={user?.email || 'User'}>
                   {user?.email || 'User'}
                 </p>
                 <p className="text-xs text-gray-500">Business Owner</p>

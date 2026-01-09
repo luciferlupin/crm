@@ -213,7 +213,7 @@ const Tasks = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white rounded-xl shadow-sm p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -221,15 +221,6 @@ const Tasks = () => {
               <p className="text-2xl font-bold text-gray-800">{taskStats.todo}</p>
             </div>
             <Circle className="text-gray-400" size={24} />
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">In Progress</p>
-              <p className="text-2xl font-bold text-gray-800">{taskStats.inProgress}</p>
-            </div>
-            <AlertCircle className="text-yellow-500" size={24} />
           </div>
         </div>
         <div className="bg-white rounded-xl shadow-sm p-6">

@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard.jsx'
 import Customers from './pages/Customers.jsx'
 import Leads from './pages/Leads.jsx'
 import Sales from './pages/Sales.jsx'
+import Products from './pages/Products.jsx'
 import Tasks from './pages/Tasks.jsx'
 import Login from './components/Login.jsx'
 
@@ -37,6 +38,7 @@ function AppContent() {
           <Route path="/customers" element={<Customers />} />
           <Route path="/leads" element={<Leads />} />
           <Route path="/sales" element={<Sales />} />
+          <Route path="/products" element={<Products />} />
           <Route path="/tasks" element={<Tasks />} />
         </Routes>
       </div>
