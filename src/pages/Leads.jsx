@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Plus, Search, Filter, Target, Clock, CheckCircle, XCircle, X, Edit2, Save, Phone, Mail, Building, Calendar, TrendingUp, User, DollarSign, BarChart3, PieChart, Activity, MessageSquare, Video, Settings, ExternalLink, History, MessageCircle } from 'lucide-react'
+import { Plus, Search, Filter, Target, Clock, CheckCircle, XCircle, X, Edit2, Save, Phone, Mail, Building, Calendar, TrendingUp, User, IndianRupee, BarChart3, PieChart, Activity, MessageSquare, Video, Settings, ExternalLink, History, MessageCircle } from 'lucide-react'
 import { leadService } from '../services/leadService.js'
 
 const Leads = () => {
@@ -640,8 +640,8 @@ const Leads = () => {
                   value={formData.value}
                   onChange={(e) => setFormData({...formData, value: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="$0"
-                  pattern="[$]?[0-9]+([,.][0-9]{1,2})?"
+                  placeholder="₹0"
+                  pattern="₹?[$]?[0-9]+([,.][0-9]{1,2})?"
                 />
               </div>
               <div>
@@ -934,8 +934,8 @@ const Leads = () => {
                         />
                       ) : (
                         <div className="text-sm font-medium text-gray-900 flex items-center">
-                          <DollarSign size={14} className="mr-1 text-gray-400" />
-                          {lead.value || '$0'}
+                          <IndianRupee size={14} className="mr-1 text-gray-400" />
+                          {lead.value || '₹0'}
                         </div>
                       )}
                     </td>

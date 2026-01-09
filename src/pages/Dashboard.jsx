@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Users, TrendingUp, Target, DollarSign, ArrowUpRight, ArrowDownRight } from 'lucide-react'
+import { Users, TrendingUp, Target, DollarSign, ArrowUpRight, ArrowDownRight, IndianRupee } from 'lucide-react'
 import SalesChart from '../components/SalesChart.jsx'
 import RecentActivity from '../components/RecentActivity.jsx'
 import { leadService } from '../services/leadService.js'
@@ -99,10 +99,10 @@ const Dashboard = () => {
         },
         {
           title: 'Total Revenue',
-          value: `$${totalRevenue.toLocaleString()}`,
-          change: totalRevenue > 0 ? `+$${totalRevenue.toLocaleString()}` : '+$0',
+          value: `₹${totalRevenue.toLocaleString('en-IN')}`,
+          change: totalRevenue > 0 ? `+₹${totalRevenue.toLocaleString('en-IN')}` : '+₹0',
           changeType: 'positive',
-          icon: DollarSign,
+          icon: IndianRupee,
           color: 'bg-yellow-500'
         },
         {

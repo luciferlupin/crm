@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Package, TrendingUp, DollarSign, Users, Star, BarChart3, Filter, Search } from 'lucide-react'
+import { Package, TrendingUp, IndianRupee, Users, Star, BarChart3, Filter, Search } from 'lucide-react'
 import { salesService } from '../services/salesService.js'
 
 const Products = () => {
@@ -125,14 +125,14 @@ const Products = () => {
         <div className="bg-white rounded-xl shadow-sm p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="bg-green-500 p-3 rounded-lg">
-              <DollarSign className="text-white" size={24} />
+              <IndianRupee className="text-white" size={24} />
             </div>
             <div className="flex items-center text-sm text-green-600">
               <TrendingUp size={16} className="mr-1" />
-              +${totalProductRevenue.toLocaleString()}
+              +₹{totalProductRevenue.toLocaleString('en-IN')}
             </div>
           </div>
-          <h3 className="text-2xl font-bold text-gray-800">${totalProductRevenue.toLocaleString()}</h3>
+          <h3 className="text-2xl font-bold text-gray-800">₹{totalProductRevenue.toLocaleString('en-IN')}</h3>
           <p className="text-gray-600 text-sm mt-1">Total Product Revenue</p>
         </div>
 
@@ -251,7 +251,7 @@ const Products = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
-                        ${product.totalRevenue.toLocaleString()}
+                        ₹{product.totalRevenue.toLocaleString('en-IN')}
                       </div>
                       <div className="text-sm text-gray-500">
                         {((product.totalRevenue / totalProductRevenue) * 100).toFixed(1)}% of total
@@ -263,7 +263,7 @@ const Products = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
-                        ${product.averagePrice.toFixed(2)}
+                        ₹{product.averagePrice.toFixed(2)}
                       </div>
                       <div className="text-sm text-gray-500">avg price</div>
                     </td>

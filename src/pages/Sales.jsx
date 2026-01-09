@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { TrendingUp, DollarSign, ShoppingCart, Users, Calendar, Filter, Plus, Edit2, Save, X } from 'lucide-react'
+import { TrendingUp, DollarSign, ShoppingCart, Users, Calendar, Filter, Plus, Edit2, Save, X, IndianRupee } from 'lucide-react'
 import SalesChart from '../components/SalesChart.jsx'
 import TopProducts from '../components/TopProducts.jsx'
 import { salesService } from '../services/salesService.js'
@@ -119,9 +119,9 @@ const Sales = () => {
   const stats = [
     {
       title: 'Total Revenue',
-      value: `$${totalRevenue.toLocaleString()}`,
-      change: totalRevenue > 0 ? '+$' + totalRevenue.toLocaleString() : '+$0',
-      icon: DollarSign,
+      value: `₹${totalRevenue.toLocaleString('en-IN')}`,
+      change: totalRevenue > 0 ? `+₹${totalRevenue.toLocaleString('en-IN')}` : '+₹0',
+      icon: IndianRupee,
       color: 'bg-green-500'
     },
     {
@@ -133,8 +133,8 @@ const Sales = () => {
     },
     {
       title: 'Average Order Value',
-      value: `$${Math.round(averageOrderValue).toLocaleString()}`,
-      change: averageOrderValue > 0 ? `+$${Math.round(averageOrderValue).toLocaleString()}` : '+$0',
+      value: `₹${Math.round(averageOrderValue).toLocaleString('en-IN')}`,
+      change: averageOrderValue > 0 ? `+₹${Math.round(averageOrderValue).toLocaleString('en-IN')}` : '+₹0',
       icon: TrendingUp,
       color: 'bg-purple-500'
     },
@@ -355,7 +355,7 @@ const Sales = () => {
                           className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                         />
                       ) : (
-                        `$${parseFloat(sale.amount).toLocaleString()}`
+                        `₹${parseFloat(sale.amount).toLocaleString('en-IN')}`
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -472,7 +472,7 @@ const Sales = () => {
                       {sale.product}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      ${parseFloat(sale.amount).toLocaleString()}
+                      ₹{parseFloat(sale.amount).toLocaleString('en-IN')}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {sale.date}
