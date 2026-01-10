@@ -114,13 +114,6 @@ const Leads = () => {
 
   useEffect(() => {
     fetchLeads()
-    
-    // Set up real-time refresh every 30 seconds
-    const interval = setInterval(() => {
-      fetchLeads()
-    }, 30000)
-    
-    return () => clearInterval(interval)
   }, [])
 
   const fetchLeads = async () => {
@@ -637,30 +630,31 @@ const Leads = () => {
   }
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-8">
+    <div className="p-4 sm:p-6 lg:p-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Leads</h1>
-          <p className="text-gray-600 mt-2">Track and manage your sales pipeline</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Leads</h1>
+          <p className="text-gray-600 mt-2 text-sm sm:text-base">Track and manage your sales pipeline</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           <button 
             onClick={() => setShowAnalytics(!showAnalytics)}
-            className={`px-4 py-2 rounded-lg transition-colors flex items-center ${
+            className={`px-3 sm:px-4 py-2 rounded-lg transition-colors flex items-center justify-center text-sm sm:text-base ${
               showAnalytics 
                 ? 'bg-primary-600 text-white hover:bg-primary-700' 
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            <BarChart3 size={20} className="mr-2" />
-            {showAnalytics ? 'Hide Analytics' : 'Show Analytics'}
+            <BarChart3 size={18} className="mr-2" />
+            <span className="hidden sm:inline">{showAnalytics ? 'Hide Analytics' : 'Show Analytics'}</span>
+            <span className="sm:hidden">{showAnalytics ? 'Hide' : 'Show'}</span>
           </button>
           <button 
             onClick={() => setShowAddForm(true)}
-            className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center"
+            className="bg-primary-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center justify-center text-sm sm:text-base"
             data-add-lead-btn
           >
-            <Plus size={20} className="mr-2" />
+            <Plus size={18} className="mr-2" />
             Add Lead
           </button>
         </div>
@@ -673,27 +667,27 @@ const Leads = () => {
       )}
 
       {showAnalytics && (
-        <div className="mb-8 space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="mb-6 sm:mb-8 space-y-4 sm:space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {/* Lead Conversion Funnel */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
-                <BarChart3 size={20} className="mr-2 text-blue-600" />
+            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6 flex items-center">
+                <BarChart3 size={18} className="mr-2 text-blue-600" />
                 Lead Conversion Funnel
               </h2>
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {analytics.conversionFunnel.map((stage, index) => (
                   <div key={stage.stage} className="relative">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium text-gray-700">{stage.stage}</span>
-                      <div className="flex items-center gap-3">
-                        <span className="text-sm text-gray-600">{stage.count} leads</span>
-                        <span className="text-sm font-semibold text-blue-600">{stage.percentage}%</span>
+                      <span className="text-xs sm:text-sm font-medium text-gray-700">{stage.stage}</span>
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <span className="text-xs sm:text-sm text-gray-600">{stage.count} leads</span>
+                        <span className="text-xs sm:text-sm font-semibold text-blue-600">{stage.percentage}%</span>
                       </div>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-8 relative overflow-hidden">
+                    <div className="w-full bg-gray-200 rounded-full h-6 sm:h-8 relative overflow-hidden">
                       <div 
-                        className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-500 flex items-center justify-end pr-3"
+                        className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-500 flex items-center justify-end pr-2 sm:pr-3"
                         style={{ width: `${stage.percentage}%` }}
                       >
                         {stage.percentage > 10 && (
@@ -704,7 +698,7 @@ const Leads = () => {
                     {index < analytics.conversionFunnel.length - 1 && (
                       <div className="flex justify-center mt-2">
                         <div className="text-gray-400">
-                          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                          <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
                             <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                           </svg>
                         </div>
@@ -716,28 +710,28 @@ const Leads = () => {
             </div>
 
             {/* Lead Source Performance */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
-                <PieChart size={20} className="mr-2 text-green-600" />
+            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6 flex items-center">
+                <PieChart size={18} className="mr-2 text-green-600" />
                 Lead Source Performance
               </h2>
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {analytics.sourceStats.slice(0, 5).map((source, index) => (
                   <div key={source.source} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex items-center flex-1">
-                      <div className={`w-3 h-3 rounded-full mr-3 ${
+                      <div className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full mr-2 sm:mr-3 ${
                         index === 0 ? 'bg-green-500' :
                         index === 1 ? 'bg-blue-500' :
                         index === 2 ? 'bg-yellow-500' :
                         index === 3 ? 'bg-purple-500' : 'bg-gray-500'
                       }`} />
                       <div>
-                        <div className="text-sm font-medium text-gray-900">{source.source}</div>
+                        <div className="text-xs sm:text-sm font-medium text-gray-900 truncate max-w-[100px] sm:max-w-none">{source.source}</div>
                         <div className="text-xs text-gray-500">{source.total} leads</div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-semibold text-green-600">{source.conversionRate}%</div>
+                      <div className="text-xs sm:text-sm font-semibold text-green-600">{source.conversionRate}%</div>
                       <div className="text-xs text-gray-500">{source.converted} converted</div>
                     </div>
                   </div>
@@ -749,20 +743,20 @@ const Leads = () => {
       )}
 
       {showAddForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Add New Lead</h2>
+              <h2 className="text-lg sm:text-xl font-semibold">Add New Lead</h2>
               <button onClick={() => setShowAddForm(false)}>
-                <X size={20} className="text-gray-500" />
+                <X size={18} className="text-gray-500" />
               </button>
             </div>
 
             {/* Customer Selection Dropdown */}
-            <div className="mb-6 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 shadow-sm">
+            <div className="mb-4 sm:mb-6 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-3 sm:p-4 shadow-sm">
               <div className="flex items-center mb-3">
-                <div className="bg-green-600 p-2 rounded-lg mr-3">
-                  <UserPlus size={18} className="text-white" />
+                <div className="bg-green-600 p-1.5 sm:p-2 rounded-lg mr-3">
+                  <UserPlus size={16} className="text-white" />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-green-900">
@@ -778,7 +772,7 @@ const Leads = () => {
                       autoFillFromExistingCustomer(e.target.value)
                     }
                   }}
-                  className="w-full px-4 py-3 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-sm font-medium appearance-none cursor-pointer hover:border-green-400 transition-colors"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-sm font-medium appearance-none cursor-pointer hover:border-green-400 transition-colors"
                 >
                   <option value="">👤 Choose existing customer to auto-fill...</option>
                   {getAllCustomersFromStorage().map((customer, index) => (
@@ -788,7 +782,7 @@ const Leads = () => {
                   ))}
                 </select>
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                  <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </div>
@@ -798,7 +792,7 @@ const Leads = () => {
                 <span>Customers are automatically saved when you add them to any form</span>
               </div>
             </div>
-            <form onSubmit={handleAddLead} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <form onSubmit={handleAddLead} className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
                 <input
@@ -806,7 +800,7 @@ const Leads = () => {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                   placeholder="Enter lead's full name"
                 />
               </div>
@@ -817,7 +811,7 @@ const Leads = () => {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                   placeholder="lead@example.com"
                 />
               </div>
@@ -827,7 +821,7 @@ const Leads = () => {
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                   placeholder="+91 98765 43210"
                   pattern="[+]?[0-9]{1,4}?[-\s]?[0-9]{1,4}"
                 />
@@ -838,7 +832,7 @@ const Leads = () => {
                   type="text"
                   value={formData.company}
                   onChange={(e) => setFormData({...formData, company: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                   placeholder="Company name"
                 />
               </div>
@@ -848,7 +842,7 @@ const Leads = () => {
                   <select
                     value={formData.location || ''}
                     onChange={(e) => setFormData({...formData, location: e.target.value})}
-                    className="w-full px-4 py-3 pr-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-green-400 transition-colors duration-200"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 pr-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-green-400 transition-colors duration-200 text-sm"
                   >
                     <option value="">📍 Select a state...</option>
                     {indianStates.map((state, index) => (
@@ -858,7 +852,7 @@ const Leads = () => {
                     ))}
                   </select>
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 9l6 6m0 0l6-6" />
                     </svg>
                   </div>
@@ -868,7 +862,7 @@ const Leads = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Value</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <IndianRupee size={16} className="text-gray-400" />
+                    <IndianRupee size={14} className="text-gray-400" />
                   </div>
                   <input
                     type="text"
@@ -881,7 +875,7 @@ const Leads = () => {
                       const parsed = parseIndianCurrency(e.target.value);
                       setFormData({...formData, value: parsed.toString()});
                     }}
-                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full pl-9 sm:pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                     placeholder="0"
                     min="0"
                   />
@@ -895,7 +889,7 @@ const Leads = () => {
                   max="100"
                   value={formData.score === 50 ? '' : formData.score}
                   onChange={(e) => {
-                    // Prevent backspace from deleting the first digit
+                    // Prevent backspace from deleting first digit
                     const value = e.target.value
                     if (value.length === 1 && e.key === 'Backspace') {
                       e.preventDefault()
@@ -911,14 +905,14 @@ const Leads = () => {
                     setFormData({...formData, score: e.target.value || 50})
                   }}
                   onKeyDown={(e) => {
-                    // Prevent backspace from deleting the first digit when field is empty or has only one digit
+                    // Prevent backspace from deleting first digit when field is empty or has only one digit
                     const value = e.target.value
                     if (e.key === 'Backspace' && value.length === 1) {
                       e.preventDefault()
                       return
                     }
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                   placeholder="Enter score (0-100)"
                 />
               </div>
@@ -928,7 +922,7 @@ const Leads = () => {
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({...formData, status: e.target.value})}
-                    className="w-full px-4 py-3 pr-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-green-400 transition-colors duration-200"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 pr-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-green-400 transition-colors duration-200 text-sm"
                   >
                     <option value="new">🆕 New</option>
                     <option value="contacted">📞 Contacted</option>
@@ -937,7 +931,7 @@ const Leads = () => {
                     <option value="lost">❌ Lost</option>
                   </select>
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 9l6 6m0 0l6-6" />
                     </svg>
                   </div>
@@ -949,7 +943,7 @@ const Leads = () => {
                   <select
                     value={formData.source}
                     onChange={(e) => setFormData({...formData, source: e.target.value})}
-                    className="w-full px-4 py-3 pr-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-green-400 transition-colors duration-200"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 pr-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-green-400 transition-colors duration-200 text-sm"
                   >
                     <option value="Website">🌐 Website</option>
                     <option value="Email">📧 Email</option>
@@ -959,7 +953,7 @@ const Leads = () => {
                     <option value="Other">📝 Other</option>
                   </select>
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 9l6 6m0 0l6-6" />
                     </svg>
                   </div>
@@ -971,12 +965,12 @@ const Leads = () => {
                   type="text"
                   value={formData.assigned_to}
                   onChange={(e) => setFormData({...formData, assigned_to: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Created Date</label>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-4 gap-1 sm:gap-2">
                   <div>
                     <select
                       value={new Date(formData.created_date).getMonth() + 1}
@@ -987,7 +981,7 @@ const Leads = () => {
                         const newDate = new Date(year, month - 1, day).toISOString().split('T')[0]
                         setFormData({...formData, created_date: newDate})
                       }}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-green-400 transition-colors duration-200"
+                      className="w-full px-2 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-green-400 transition-colors duration-200 text-xs sm:text-sm"
                     >
                       <option value="">Month</option>
                       {months.map((month, index) => (
@@ -1007,7 +1001,7 @@ const Leads = () => {
                         const newDate = new Date(year, month - 1, day).toISOString().split('T')[0]
                         setFormData({...formData, created_date: newDate})
                       }}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-green-400 transition-colors duration-200"
+                      className="w-full px-2 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-green-400 transition-colors duration-200 text-xs sm:text-sm"
                     >
                       <option value="">Day</option>
                       {days.map((day, index) => (
@@ -1027,7 +1021,7 @@ const Leads = () => {
                         const newDate = new Date(year, month - 1, day).toISOString().split('T')[0]
                         setFormData({...formData, created_date: newDate})
                       }}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-green-400 transition-colors duration-200"
+                      className="w-full px-2 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-green-400 transition-colors duration-200 text-xs sm:text-sm"
                     >
                       <option value="">Year</option>
                       {years.map((year, index) => (
@@ -1044,22 +1038,22 @@ const Leads = () => {
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData({...formData, notes: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                   rows="3"
                   placeholder="Additional notes about this lead..."
                 />
               </div>
-              <div className="md:col-span-2 flex gap-3">
+              <div className="md:col-span-2 flex gap-2 sm:gap-3">
                 <button
                   type="button"
                   onClick={() => setShowAddForm(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+                  className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 text-sm sm:text-base"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
+                  className="flex-1 px-3 sm:px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 text-sm sm:text-base"
                 >
                   Add Lead
                 </button>
@@ -1069,64 +1063,64 @@ const Leads = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-xl shadow-sm p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">New Leads</p>
-              <p className="text-2xl font-bold text-gray-800">{leads.filter(l => l.status === 'new').length}</p>
+              <p className="text-xs sm:text-sm text-gray-600">New Leads</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-800">{leads.filter(l => l.status === 'new').length}</p>
             </div>
-            <Target className="text-blue-500" size={24} />
+            <Target className="text-blue-500" size={20} />
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Qualified</p>
-              <p className="text-2xl font-bold text-gray-800">{leads.filter(l => l.status === 'qualified').length}</p>
+              <p className="text-xs sm:text-sm text-gray-600">Qualified</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-800">{leads.filter(l => l.status === 'qualified').length}</p>
             </div>
-            <CheckCircle className="text-green-500" size={24} />
+            <CheckCircle className="text-green-500" size={20} />
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Converted</p>
-              <p className="text-2xl font-bold text-gray-800">{leads.filter(l => l.status === 'converted').length}</p>
+              <p className="text-xs sm:text-sm text-gray-600">Converted</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-800">{leads.filter(l => l.status === 'converted').length}</p>
             </div>
-            <CheckCircle className="text-green-600" size={24} />
+            <CheckCircle className="text-green-600" size={20} />
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Conversion Rate</p>
-              <p className="text-2xl font-bold text-gray-800">
+              <p className="text-xs sm:text-sm text-gray-600">Conversion Rate</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-800">
                 {leads.length > 0 ? Math.round((leads.filter(l => l.status === 'converted').length / leads.length) * 100) : 0}%
               </p>
             </div>
-            <Target className="text-purple-500" size={24} />
+            <Target className="text-purple-500" size={20} />
           </div>
         </div>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex flex-col sm:flex-row gap-4">
+        <div className="p-4 sm:p-6 border-b border-gray-200">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
               <input
                 type="text"
                 placeholder="Search leads..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full pl-9 sm:pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
               />
             </div>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
             >
               <option value="all">All Status</option>
               <option value="new">New</option>
@@ -1139,31 +1133,31 @@ const Leads = () => {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Lead
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Company & Source
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Score
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Value
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Assigned To
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Quick Actions
                 </th>
               </tr>
@@ -1171,52 +1165,52 @@ const Leads = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredLeads.length === 0 ? (
                 <tr>
-                  <td colSpan="8" className="px-6 py-12 text-center">
+                  <td colSpan="8" className="px-3 sm:px-6 py-8 sm:py-12 text-center">
                     <div className="text-gray-500">
-                      <Target className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                      <p>No leads found</p>
-                      <p className="text-sm mt-1">Add your first lead to get started</p>
+                      <Target className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4 text-gray-300" />
+                      <p className="text-sm sm:text-base">No leads found</p>
+                      <p className="text-xs sm:text-sm mt-1">Add your first lead to get started</p>
                     </div>
                   </td>
                 </tr>
               ) : (
                 filteredLeads.map((lead) => (
                   <tr key={lead.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10 bg-primary-100 rounded-full flex items-center justify-center">
-                          <User className="text-primary-600" size={16} />
+                        <div className="flex-shrink-0 h-8 w-8 sm:h-10 sm:w-10 bg-primary-100 rounded-full flex items-center justify-center">
+                          <User className="text-primary-600" size={14} />
                         </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">{lead.name}</div>
-                          <div className="flex items-center text-sm text-gray-500">
-                            <Mail size={12} className="mr-1" />
-                            {lead.email}
+                        <div className="ml-2 sm:ml-4">
+                          <div className="text-xs sm:text-sm font-medium text-gray-900 truncate max-w-[120px] sm:max-w-none">{lead.name}</div>
+                          <div className="flex items-center text-xs sm:text-sm text-gray-500">
+                            <Mail size={10} className="mr-1" />
+                            <span className="truncate max-w-[100px] sm:max-w-none">{lead.email}</span>
                           </div>
                           {lead.phone && (
-                            <div className="flex items-center text-sm text-gray-500 mt-1">
-                              <Phone size={12} className="mr-1" />
-                              {lead.phone}
+                            <div className="flex items-center text-xs sm:text-sm text-gray-500 mt-1">
+                              <Phone size={10} className="mr-1" />
+                              <span className="truncate max-w-[80px] sm:max-w-none">{lead.phone}</span>
                             </div>
                           )}
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 flex items-center">
-                        <Building size={14} className="mr-2 text-gray-400" />
-                        {lead.company || 'N/A'}
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                      <div className="text-xs sm:text-sm text-gray-900 flex items-center">
+                        <Building size={12} className="mr-2 text-gray-400" />
+                        <span className="truncate max-w-[80px] sm:max-w-none">{lead.company || 'N/A'}</span>
                       </div>
-                      <div className="text-sm text-gray-500 mt-1">
+                      <div className="text-xs text-gray-500 mt-1">
                         Source: {lead.source}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                       {editingLead === lead.id ? (
                         <select
                           value={formData.status}
                           onChange={(e) => setFormData({...formData, status: e.target.value})}
-                          className="px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                          className="px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent text-xs sm:text-sm"
                         >
                           <option value="new">New</option>
                           <option value="contacted">Contacted</option>
@@ -1225,7 +1219,7 @@ const Leads = () => {
                           <option value="lost">Lost</option>
                         </select>
                       ) : (
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-1 sm:space-x-2">
                           {getStatusIcon(lead.status)}
                           <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(lead.status)}`}>
                             {lead.status?.charAt(0).toUpperCase() + lead.status?.slice(1)}
@@ -1233,7 +1227,7 @@ const Leads = () => {
                         </div>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                       {editingLead === lead.id ? (
                         <input
                           type="number"
@@ -1241,14 +1235,14 @@ const Leads = () => {
                           max="100"
                           value={formData.score}
                           onChange={(e) => setFormData({...formData, score: parseInt(e.target.value) || 50})}
-                          className="w-16 px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                          className="w-12 sm:w-16 px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent text-xs sm:text-sm"
                         />
                       ) : (
                         <div className="flex items-center">
-                          <div className={`text-sm font-medium ${getScoreColor(lead.score)}`}>
+                          <div className={`text-xs sm:text-sm font-medium ${getScoreColor(lead.score)}`}>
                             {lead.score}/100
                           </div>
-                          <div className="ml-2 w-12 bg-gray-200 rounded-full h-2">
+                          <div className="ml-1 sm:ml-2 w-8 sm:w-12 bg-gray-200 rounded-full h-2">
                             <div 
                               className={`h-2 rounded-full ${
                                 lead.score >= 80 ? 'bg-green-500' : 
@@ -1260,85 +1254,85 @@ const Leads = () => {
                         </div>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                       {editingLead === lead.id ? (
                         <input
                           type="text"
                           value={formData.value}
                           onChange={(e) => setFormData({...formData, value: e.target.value})}
-                          className="w-20 px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                          className="w-16 sm:w-20 px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent text-xs sm:text-sm"
                         />
                       ) : (
-                        <div className="text-sm font-medium text-gray-900 flex items-center">
-                          <IndianRupee size={14} className="mr-1 text-gray-400" />
+                        <div className="text-xs sm:text-sm font-medium text-gray-900 flex items-center">
+                          <IndianRupee size={12} className="mr-1 text-gray-400" />
                           {formatIndianCurrency(lead.value)}
                         </div>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                       {editingLead === lead.id ? (
                         <input
                           type="text"
                           value={formData.assigned_to}
                           onChange={(e) => setFormData({...formData, assigned_to: e.target.value})}
-                          className="w-24 px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                          className="w-20 sm:w-24 px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent text-xs sm:text-sm"
                         />
                       ) : (
-                        <div className="text-sm text-gray-900">
+                        <div className="text-xs sm:text-sm text-gray-900">
                           {lead.assigned_to || (
                             <span className="text-gray-400 italic">Unassigned</span>
                           )}
                         </div>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                       {editingLead === lead.id ? (
-                        <div className="flex space-x-2">
+                        <div className="flex space-x-1 sm:space-x-2">
                           <button 
                             onClick={() => handleUpdate(lead.id)}
                             className="text-green-600 hover:text-green-900"
                             title="Save"
                           >
-                            <Save size={16} />
+                            <Save size={14} />
                           </button>
                           <button 
                             onClick={cancelEdit}
                             className="text-gray-600 hover:text-gray-900"
                             title="Cancel"
                           >
-                            <X size={16} />
+                            <X size={14} />
                           </button>
                         </div>
                       ) : (
-                        <div className="flex space-x-2">
+                        <div className="flex space-x-1 sm:space-x-2">
                           <button 
                             onClick={() => handleEdit(lead)}
                             className="text-blue-600 hover:text-blue-900"
                             title="Edit"
                           >
-                            <Edit2 size={16} />
+                            <Edit2 size={14} />
                           </button>
                           <button 
                             onClick={() => handleDelete(lead.id)}
                             className="text-red-600 hover:text-red-900"
                             title="Delete"
                           >
-                            <X size={16} />
+                            <X size={14} />
                           </button>
                         </div>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex space-x-2">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                      <div className="flex space-x-1 sm:space-x-2">
                         <button 
                           onClick={() => {
                             setSelectedLead(lead)
                             setShowActivityModal(true)
                           }}
-                          className="text-purple-600 hover:text-purple-900 bg-purple-50 p-2 rounded-lg"
+                          className="text-purple-600 hover:text-purple-900 bg-purple-50 p-1.5 sm:p-2 rounded-lg"
                           title="Add Activity"
                         >
-                          <History size={16} />
+                          <History size={14} />
                         </button>
                         <button 
                           onClick={() => {
@@ -1346,12 +1340,12 @@ const Leads = () => {
                             setShowWhatsAppModal(true)
                             setWhatsappMessage('')
                           }}
-                          className="text-green-600 hover:text-green-900 bg-green-50 p-2 rounded-lg"
+                          className="text-green-600 hover:text-green-900 bg-green-50 p-1.5 sm:p-2 rounded-lg"
                           title="Send WhatsApp Message"
                         >
-                          <MessageCircle size={16} />
+                          <MessageCircle size={14} />
                         </button>
-                                              </div>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -1363,29 +1357,29 @@ const Leads = () => {
 
       {/* Activity Timeline Modal */}
       {showActivityModal && selectedLead && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold flex items-center">
-                <History className="mr-2 text-purple-600" size={24} />
-                Activity Timeline - {selectedLead.name}
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4 sm:mb-6">
+              <h2 className="text-lg sm:text-xl font-semibold flex items-center">
+                <History className="mr-2 text-purple-600" size={20} />
+                <span className="truncate max-w-[200px] sm:max-w-none">Activity Timeline - {selectedLead.name}</span>
               </h2>
               <button onClick={() => setShowActivityModal(false)}>
-                <X size={20} className="text-gray-500" />
+                <X size={18} className="text-gray-500" />
               </button>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               {/* Add New Activity */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="text-lg font-medium mb-4">Log New Activity</h3>
-                <form onSubmit={(e) => { e.preventDefault(); handleAddActivity(); }} className="space-y-4">
+              <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
+                <h3 className="text-base sm:text-lg font-medium mb-3 sm:mb-4">Log New Activity</h3>
+                <form onSubmit={(e) => { e.preventDefault(); handleAddActivity(); }} className="space-y-3 sm:space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Activity Type</label>
                     <select
                       value={activityForm.type}
                       onChange={(e) => setActivityForm({...activityForm, type: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
                     >
                       <option value="call">Phone Call</option>
                       <option value="email">Email</option>
@@ -1399,7 +1393,7 @@ const Leads = () => {
                       type="datetime-local"
                       value={activityForm.date}
                       onChange={(e) => setActivityForm({...activityForm, date: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
                     />
                   </div>
                   <div>
@@ -1409,7 +1403,7 @@ const Leads = () => {
                       placeholder="30 minutes"
                       value={activityForm.duration}
                       onChange={(e) => setActivityForm({...activityForm, duration: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
                     />
                   </div>
                   <div>
@@ -1418,9 +1412,9 @@ const Leads = () => {
                       required
                       value={activityForm.description}
                       onChange={(e) => setActivityForm({...activityForm, description: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
                       rows="3"
-                      placeholder="Describe the activity..."
+                      placeholder="Describe activity..."
                     />
                   </div>
                   <div>
@@ -1429,13 +1423,13 @@ const Leads = () => {
                       type="text"
                       value={activityForm.outcome}
                       onChange={(e) => setActivityForm({...activityForm, outcome: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
                       placeholder="e.g., Interested, Follow-up needed, Not interested"
                     />
                   </div>
                   <button
                     type="submit"
-                    className="w-full px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+                    className="w-full px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 text-sm sm:text-base"
                   >
                     Log Activity
                   </button>
@@ -1443,14 +1437,14 @@ const Leads = () => {
               </div>
 
               {/* Activity History */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="text-lg font-medium mb-4">Activity History</h3>
-                <div className="space-y-3 max-h-96 overflow-y-auto">
+              <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
+                <h3 className="text-base sm:text-lg font-medium mb-3 sm:mb-4">Activity History</h3>
+                <div className="space-y-3 max-h-80 sm:max-h-96 overflow-y-auto">
                   {getLeadActivities(selectedLead.id).length === 0 ? (
-                    <div className="text-center text-gray-500 py-8">
-                      <History size={48} className="mx-auto mb-4 text-gray-300" />
-                      <p>No activities logged yet</p>
-                      <p className="text-sm mt-1">Start by logging your first interaction</p>
+                    <div className="text-center text-gray-500 py-6 sm:py-8">
+                      <History size={40} className="mx-auto mb-3 sm:mb-4 text-gray-300" />
+                      <p className="text-sm sm:text-base">No activities logged yet</p>
+                      <p className="text-xs sm:text-sm mt-1">Start by logging your first interaction</p>
                     </div>
                   ) : (
                     getLeadActivities(selectedLead.id).map((activity) => (
@@ -1458,8 +1452,8 @@ const Leads = () => {
                         <div className="flex items-start justify-between">
                           <div className="flex items-center">
                             {getActivityIcon(activity.type)}
-                            <div className="ml-3">
-                              <div className="text-sm font-medium text-gray-900 capitalize">
+                            <div className="ml-2 sm:ml-3">
+                              <div className="text-xs sm:text-sm font-medium text-gray-900 capitalize">
                                 {activity.type}
                               </div>
                               <div className="text-xs text-gray-500">
@@ -1473,9 +1467,9 @@ const Leads = () => {
                             </span>
                           )}
                         </div>
-                        <div className="mt-2 text-sm text-gray-700">{activity.description}</div>
+                        <div className="mt-2 text-xs sm:text-sm text-gray-700">{activity.description}</div>
                         {activity.outcome && (
-                          <div className="mt-2 text-sm text-gray-600">
+                          <div className="mt-2 text-xs sm:text-sm text-gray-600">
                             <strong>Outcome:</strong> {activity.outcome}
                           </div>
                         )}
@@ -1491,23 +1485,23 @@ const Leads = () => {
 
       {/* WhatsApp Messaging Modal */}
       {showWhatsAppModal && selectedLead && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold flex items-center">
-                <MessageCircle className="mr-2 text-green-600" size={24} />
-                Send WhatsApp Message - {selectedLead.name}
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-2xl">
+            <div className="flex justify-between items-center mb-4 sm:mb-6">
+              <h2 className="text-lg sm:text-xl font-semibold flex items-center">
+                <MessageCircle className="mr-2 text-green-600" size={20} />
+                <span className="truncate max-w-[200px] sm:max-w-none">Send WhatsApp Message - {selectedLead.name}</span>
               </h2>
               <button onClick={() => setShowWhatsAppModal(false)}>
-                <X size={20} className="text-gray-500" />
+                <X size={18} className="text-gray-500" />
               </button>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               {/* Lead Information */}
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-medium text-gray-900 mb-4">Lead Information</h3>
-                <div className="space-y-2 text-sm">
+              <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
+                <h3 className="font-medium text-gray-900 mb-3 sm:mb-4 text-sm sm:text-base">Lead Information</h3>
+                <div className="space-y-2 text-xs sm:text-sm">
                   <div><strong>Name:</strong> {selectedLead.name}</div>
                   <div><strong>Email:</strong> {selectedLead.email}</div>
                   <div><strong>Phone:</strong> {selectedLead.phone || 'Not provided'}</div>
@@ -1517,11 +1511,11 @@ const Leads = () => {
               </div>
 
               {/* Message Composition */}
-              <div className="space-y-4">
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="font-medium text-gray-900 mb-4">Compose Message</h3>
+              <div className="space-y-3 sm:space-y-4">
+                <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
+                  <h3 className="font-medium text-gray-900 mb-3 sm:mb-4 text-sm sm:text-base">Compose Message</h3>
                   
-                  <div className="mb-4">
+                  <div className="mb-3 sm:mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Your Message
                     </label>
@@ -1529,56 +1523,56 @@ const Leads = () => {
                       value={whatsappMessage}
                       onChange={(e) => setWhatsappMessage(e.target.value)}
                       placeholder="Type your message here..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                      rows="4"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                      rows="3 sm:rows-4"
                     />
                   </div>
 
                   <button
                     onClick={handleSendWhatsAppMessage}
                     disabled={!selectedLead?.phone || !whatsappMessage.trim()}
-                    className={`w-full px-4 py-3 rounded-md flex items-center justify-center ${
+                    className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-md flex items-center justify-center text-xs sm:text-sm ${
                       selectedLead?.phone && whatsappMessage.trim()
                         ? 'bg-green-600 text-white hover:bg-green-700' 
                         : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
                   >
-                    <MessageCircle size={20} className="mr-2" />
+                    <MessageCircle size={16} className="mr-2" />
                     Send WhatsApp Message
                   </button>
                 </div>
 
                 {/* Message Suggestions */}
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <h3 className="font-medium text-blue-900 mb-3">Message Suggestions</h3>
+                <div className="bg-blue-50 p-3 sm:p-4 rounded-lg">
+                  <h3 className="font-medium text-blue-900 mb-2 sm:mb-3 text-sm sm:text-base">Message Suggestions</h3>
                   <div className="space-y-2">
                     <button
                       onClick={() => setMessageSuggestion(`Hi ${selectedLead.name}! 👋\n\nI'm reaching out from your recent inquiry. I'd love to discuss how we can help your business grow. When would be a good time for a quick call?\n\nBest regards,\n${selectedLead.assigned_to || 'Your Team'}`)}
-                      className="w-full text-left px-3 py-2 bg-white border border-blue-200 rounded-md hover:bg-blue-100 text-sm"
+                      className="w-full text-left px-2 sm:px-3 py-2 bg-white border border-blue-200 rounded-md hover:bg-blue-100 text-xs sm:text-sm"
                     >
                       📞 Follow-up Call Request
                     </button>
                     <button
                       onClick={() => setMessageSuggestion(`Hi ${selectedLead.name}! 👋\n\nThank you for your interest in our services! I have some great information to share that could really benefit ${selectedLead.company || 'your business'}.\n\nWould you be available for a 15-minute demo this week?\n\nLooking forward to connecting!\n\n${selectedLead.assigned_to || 'Your Team'}`)}
-                      className="w-full text-left px-3 py-2 bg-white border border-blue-200 rounded-md hover:bg-blue-100 text-sm"
+                      className="w-full text-left px-2 sm:px-3 py-2 bg-white border border-blue-200 rounded-md hover:bg-blue-100 text-xs sm:text-sm"
                     >
                       🎯 Product Demo Request
                     </button>
                     <button
                       onClick={() => setMessageSuggestion(`Hi ${selectedLead.name}! 👋\n\nFollowing up on our previous conversation. I wanted to check if you had any questions about our proposal or if you need any additional information.\n\nI'm here to help make this process as smooth as possible for you.\n\nBest regards,\n${selectedLead.assigned_to || 'Your Team'}`)}
-                      className="w-full text-left px-3 py-2 bg-white border border-blue-200 rounded-md hover:bg-blue-100 text-sm"
+                      className="w-full text-left px-2 sm:px-3 py-2 bg-white border border-blue-200 rounded-md hover:bg-blue-100 text-xs sm:text-sm"
                     >
                       📋 Follow-up on Proposal
                     </button>
                     <button
                       onClick={() => setMessageSuggestion(`Hi ${selectedLead.name}! 👋\n\nGreat news! I have some exciting updates about our services that I think you'll love. We've recently added some features that could significantly improve ${selectedLead.company || 'your business'} operations.\n\nCan we schedule a quick call to discuss?\n\nBest regards,\n${selectedLead.assigned_to || 'Your Team'}`)}
-                      className="w-full text-left px-3 py-2 bg-white border border-blue-200 rounded-md hover:bg-blue-100 text-sm"
+                      className="w-full text-left px-2 sm:px-3 py-2 bg-white border border-blue-200 rounded-md hover:bg-blue-100 text-xs sm:text-sm"
                     >
                       🚀 New Features Update
                     </button>
                     <button
                       onClick={() => setMessageSuggestion(`Hi ${selectedLead.name}! 👋\n\nI hope you're having a great week! I wanted to personally reach out and see how things are going on your end.\n\nIs there anything I can help with or any questions I can answer?\n\nAlways here to support you!\n\n${selectedLead.assigned_to || 'Your Team'}`)}
-                      className="w-full text-left px-3 py-2 bg-white border border-blue-200 rounded-md hover:bg-blue-100 text-sm"
+                      className="w-full text-left px-2 sm:px-3 py-2 bg-white border border-blue-200 rounded-md hover:bg-blue-100 text-xs sm:text-sm"
                     >
                       💬 General Check-in
                     </button>

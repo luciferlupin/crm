@@ -372,29 +372,30 @@ const Customers = () => {
   }
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-8">
+    <div className="p-4 sm:p-6 lg:p-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Customers</h1>
-          <p className="text-gray-600 mt-2">Manage your customer relationships</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Customers</h1>
+          <p className="text-gray-600 mt-2 text-sm sm:text-base">Manage your customer relationships</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           <button 
             onClick={() => setShowAnalytics(!showAnalytics)}
-            className={`px-4 py-2 rounded-lg transition-colors flex items-center ${
+            className={`px-3 sm:px-4 py-2 rounded-lg transition-colors flex items-center justify-center text-sm sm:text-base ${
               showAnalytics 
                 ? 'bg-primary-600 text-white hover:bg-primary-700' 
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            <BarChart3 size={20} className="mr-2" />
-            {showAnalytics ? 'Hide Analytics' : 'Show Analytics'}
+            <BarChart3 size={18} className="mr-2" />
+            <span className="hidden sm:inline">{showAnalytics ? 'Hide Analytics' : 'Show Analytics'}</span>
+            <span className="sm:hidden">{showAnalytics ? 'Hide' : 'Show'}</span>
           </button>
           <button 
             onClick={() => setShowAddForm(!showAddForm)}
-            className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center"
+            className="bg-primary-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center justify-center text-sm sm:text-base"
           >
-            <Plus size={20} className="mr-2" />
+            <Plus size={18} className="mr-2" />
             Add Customer
           </button>
         </div>
@@ -402,113 +403,113 @@ const Customers = () => {
 
       {/* Customer Analytics Dashboard */}
       {showAnalytics && (
-        <div className="mb-8 space-y-6">
+        <div className="mb-6 sm:mb-8 space-y-4 sm:space-y-6">
           {/* Key Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Total Customers</p>
-                  <p className="text-2xl font-bold text-gray-800">{analytics.totalCustomers}</p>
+                  <p className="text-xs sm:text-sm text-gray-600">Total Customers</p>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-800">{analytics.totalCustomers}</p>
                 </div>
-                <Users className="text-blue-500" size={24} />
+                <Users className="text-blue-500" size={20} />
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Total Revenue</p>
-                  <p className="text-2xl font-bold text-gray-800">₹{analytics.totalRevenue.toLocaleString('en-IN')}</p>
+                  <p className="text-xs sm:text-sm text-gray-600">Total Revenue</p>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-800">₹{analytics.totalRevenue.toLocaleString('en-IN')}</p>
                 </div>
-                <IndianRupee className="text-yellow-500" size={24} />
+                <IndianRupee className="text-yellow-500" size={20} />
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Total Orders</p>
-                  <p className="text-2xl font-bold text-gray-800">{analytics.totalOrders}</p>
+                  <p className="text-xs sm:text-sm text-gray-600">Total Orders</p>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-800">{analytics.totalOrders}</p>
                 </div>
-                <ShoppingCart className="text-purple-500" size={24} />
+                <ShoppingCart className="text-purple-500" size={20} />
               </div>
             </div>
           </div>
 
           {/* Customer Distribution */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
-                <BarChart3 size={20} className="mr-2 text-blue-600" />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6 flex items-center">
+                <BarChart3 size={18} className="mr-2 text-blue-600" />
                 Customer Distribution
               </h2>
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
                   <div>
-                    <div className="text-sm font-medium text-blue-900">New Customers</div>
+                    <div className="text-xs sm:text-sm font-medium text-blue-900">New Customers</div>
                     <div className="text-xs text-blue-700">Joined in last 30 days</div>
                   </div>
-                  <div className="text-2xl font-bold text-blue-600">{analytics.newCustomers}</div>
+                  <div className="text-lg sm:text-2xl font-bold text-blue-600">{analytics.newCustomers}</div>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
                   <div>
-                    <div className="text-sm font-medium text-green-900">Long-term Customers</div>
+                    <div className="text-xs sm:text-sm font-medium text-green-900">Long-term Customers</div>
                     <div className="text-xs text-green-700">More than 90 days</div>
                   </div>
-                  <div className="text-2xl font-bold text-green-600">{analytics.longTermCustomers}</div>
+                  <div className="text-lg sm:text-2xl font-bold text-green-600">{analytics.longTermCustomers}</div>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg">
                   <div>
-                    <div className="text-sm font-medium text-red-900">No Orders</div>
+                    <div className="text-xs sm:text-sm font-medium text-red-900">No Orders</div>
                     <div className="text-xs text-red-700">Customers without purchases</div>
                   </div>
-                  <div className="text-2xl font-bold text-red-600">{analytics.customersWithNoOrders}</div>
+                  <div className="text-lg sm:text-2xl font-bold text-red-600">{analytics.customersWithNoOrders}</div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
-                <TrendingUp size={20} className="mr-2 text-green-600" />
+            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6 flex items-center">
+                <TrendingUp size={18} className="mr-2 text-green-600" />
                 Performance Metrics
               </h2>
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
                   <div>
-                    <div className="text-sm font-medium text-purple-900">Avg Customer Value</div>
+                    <div className="text-xs sm:text-sm font-medium text-purple-900">Avg Customer Value</div>
                     <div className="text-xs text-purple-700">Revenue per customer</div>
                   </div>
-                  <div className="text-2xl font-bold text-purple-600">₹{Math.round(analytics.avgCustomerValue).toLocaleString('en-IN')}</div>
+                  <div className="text-lg sm:text-2xl font-bold text-purple-600">₹{Math.round(analytics.avgCustomerValue).toLocaleString('en-IN')}</div>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
                   <div>
-                    <div className="text-sm font-medium text-orange-900">Avg Order Value</div>
+                    <div className="text-xs sm:text-sm font-medium text-orange-900">Avg Order Value</div>
                     <div className="text-xs text-orange-700">Revenue per order</div>
                   </div>
-                  <div className="text-2xl font-bold text-orange-600">₹{Math.round(analytics.avgOrderValue).toLocaleString('en-IN')}</div>
+                  <div className="text-lg sm:text-2xl font-bold text-orange-600">₹{Math.round(analytics.avgOrderValue).toLocaleString('en-IN')}</div>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Top Customers by Revenue */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
-              <TrendingUp size={20} className="mr-2 text-blue-600" />
+          <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6 flex items-center">
+              <TrendingUp size={18} className="mr-2 text-blue-600" />
               Top Customers by Revenue
             </h2>
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full min-w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Customer
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Orders
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Revenue
                     </th>
                   </tr>
@@ -516,24 +517,24 @@ const Customers = () => {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {analytics.topCustomersByRevenue.map((customer, index) => (
                     <tr key={index} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10">
-                            <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+                          <div className="flex-shrink-0 h-8 w-8 sm:h-10 sm:w-10">
+                            <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-xs sm:text-sm">
                               {customer.name.charAt(0).toUpperCase()}
                             </div>
                           </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">{customer.name}</div>
-                            <div className="text-sm text-gray-500">{customer.email}</div>
+                          <div className="ml-2 sm:ml-4">
+                            <div className="text-xs sm:text-sm font-medium text-gray-900 truncate max-w-[120px] sm:max-w-none">{customer.name}</div>
+                            <div className="text-xs text-gray-500 truncate max-w-[120px] sm:max-w-none">{customer.email}</div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{customer.salesData.orderCount}</div>
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                        <div className="text-xs sm:text-sm font-medium text-gray-900">{customer.salesData.orderCount}</div>
                         <div className="text-xs text-gray-500">orders</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900">
                         ₹{customer.salesData.totalRevenue.toLocaleString('en-IN')}
                       </td>
                     </tr>
@@ -544,22 +545,22 @@ const Customers = () => {
           </div>
 
           {/* Top Customers by Order Frequency */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
-              <Star size={20} className="mr-2 text-yellow-600" />
+          <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6 flex items-center">
+              <Star size={18} className="mr-2 text-yellow-600" />
               Top Customers by Order Frequency
             </h2>
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full min-w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Customer
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Orders
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Revenue
                     </th>
                   </tr>
@@ -567,24 +568,24 @@ const Customers = () => {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {analytics.topCustomersByOrders.map((customer, index) => (
                     <tr key={index} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10">
-                            <div className="h-10 w-10 rounded-full bg-gradient-to-r from-green-500 to-blue-600 flex items-center justify-center text-white font-semibold">
+                          <div className="flex-shrink-0 h-8 w-8 sm:h-10 sm:w-10">
+                            <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gradient-to-r from-green-500 to-blue-600 flex items-center justify-center text-white font-semibold text-xs sm:text-sm">
                               {customer.name.charAt(0).toUpperCase()}
                             </div>
                           </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">{customer.name}</div>
-                            <div className="text-sm text-gray-500">{customer.email}</div>
+                          <div className="ml-2 sm:ml-4">
+                            <div className="text-xs sm:text-sm font-medium text-gray-900 truncate max-w-[120px] sm:max-w-none">{customer.name}</div>
+                            <div className="text-xs text-gray-500 truncate max-w-[120px] sm:max-w-none">{customer.email}</div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{customer.salesData.orderCount}</div>
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                        <div className="text-xs sm:text-sm font-medium text-gray-900">{customer.salesData.orderCount}</div>
                         <div className="text-xs text-gray-500">orders</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900">
                         ₹{customer.salesData.totalRevenue.toLocaleString('en-IN')}
                       </td>
                     </tr>
@@ -597,14 +598,14 @@ const Customers = () => {
       )}
 
       {showAddForm && (
-        <div className="mb-6 bg-white p-6 rounded-lg border border-gray-200">
-          <h3 className="text-lg font-medium mb-4">Add New Customer</h3>
+        <div className="mb-4 sm:mb-6 bg-white p-4 sm:p-6 rounded-lg border border-gray-200">
+          <h3 className="text-base sm:text-lg font-medium mb-4">Add New Customer</h3>
           
           {/* Customer Selection Dropdown */}
-          <div className="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 shadow-sm">
+          <div className="mb-4 sm:mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-3 sm:p-4 shadow-sm">
             <div className="flex items-center mb-3">
-              <div className="bg-blue-600 p-2 rounded-lg mr-3">
-                <UserPlus size={18} className="text-white" />
+              <div className="bg-blue-600 p-1.5 sm:p-2 rounded-lg mr-3">
+                <UserPlus size={16} className="text-white" />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-blue-900">
@@ -620,7 +621,7 @@ const Customers = () => {
                     autoFillFromExistingCustomer(e.target.value)
                   }
                 }}
-                className="w-full px-4 py-3 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm font-medium appearance-none cursor-pointer hover:border-blue-400 transition-colors"
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-sm font-medium appearance-none cursor-pointer hover:border-blue-400 transition-colors"
               >
                 <option value="">👤 Choose existing customer to auto-fill...</option>
                 {getAllCustomersFromStorage().map((customer, index) => (
@@ -630,7 +631,7 @@ const Customers = () => {
                 ))}
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
@@ -641,7 +642,7 @@ const Customers = () => {
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
               <input
@@ -649,7 +650,7 @@ const Customers = () => {
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
               />
             </div>
             <div>
@@ -659,7 +660,7 @@ const Customers = () => {
                 required
                 value={formData.email}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
               />
             </div>
             <div>
@@ -668,7 +669,7 @@ const Customers = () => {
                 type="tel"
                 value={formData.phone}
                 onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
               />
             </div>
             <div>
@@ -677,7 +678,7 @@ const Customers = () => {
                 type="text"
                 value={formData.company}
                 onChange={(e) => setFormData({...formData, company: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
               />
             </div>
             <div>
@@ -686,7 +687,7 @@ const Customers = () => {
                 <select
                   value={formData.location}
                   onChange={(e) => setFormData({...formData, location: e.target.value})}
-                  className="w-full px-4 py-3 pr-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-blue-400 transition-colors duration-200"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 pr-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-blue-400 transition-colors duration-200 text-sm"
                 >
                   <option value="">📍 Select a state...</option>
                   {indianStates.map((state, index) => (
@@ -696,16 +697,16 @@ const Customers = () => {
                   ))}
                 </select>
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 9l6 6m0 0l6-6" />
                   </svg>
                 </div>
               </div>
             </div>
-            <div className="md:col-span-2">
+            <div className="sm:col-span-2">
               <button
                 type="submit"
-                className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
+                className="px-4 sm:px-6 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors text-sm sm:text-base"
               >
                 Add Customer
               </button>
@@ -715,39 +716,39 @@ const Customers = () => {
       )}
 
       <div className="bg-white rounded-xl shadow-sm">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex flex-col sm:flex-row gap-4">
+        <div className="p-4 sm:p-6 border-b border-gray-200">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
               <input
                 type="text"
                 placeholder="Search customers..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full pl-9 sm:pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
               />
             </div>
-            <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center">
-              <Filter size={20} className="mr-2" />
-              Filter
+            <button className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center text-sm">
+              <Filter size={16} className="mr-2" />
+              <span className="hidden sm:inline">Filter</span>
             </button>
           </div>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Customer
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Company
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -755,31 +756,31 @@ const Customers = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredCustomers.length === 0 ? (
                 <tr>
-                  <td colSpan="4" className="px-6 py-12 text-center">
+                  <td colSpan="4" className="px-3 sm:px-6 py-8 sm:py-12 text-center">
                     <div className="text-gray-500">
-                      <Building className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                      <p>No customers found</p>
-                      <p className="text-sm mt-1">Add your first customer to get started</p>
+                      <Building className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4 text-gray-300" />
+                      <p className="text-sm sm:text-base">No customers found</p>
+                      <p className="text-xs sm:text-sm mt-1">Add your first customer to get started</p>
                     </div>
                   </td>
                 </tr>
               ) : (
                 filteredCustomers.map((customer) => (
                   <tr key={customer.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                       <div>
-                        <div className="text-sm font-medium text-gray-900">{customer.name}</div>
-                        <div className="text-sm text-gray-500">{customer.email}</div>
+                        <div className="text-xs sm:text-sm font-medium text-gray-900 truncate max-w-[120px] sm:max-w-none">{customer.name}</div>
+                        <div className="text-xs text-gray-500 truncate max-w-[120px] sm:max-w-none">{customer.email}</div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{customer.company}</div>
-                      <div className="text-sm text-gray-500 flex items-center">
-                        <MapPin size={12} className="mr-1" />
-                        {customer.location}
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                      <div className="text-xs sm:text-sm text-gray-900 truncate max-w-[100px] sm:max-w-none">{customer.company}</div>
+                      <div className="text-xs text-gray-500 flex items-center">
+                        <MapPin size={10} className="mr-1" />
+                        <span className="truncate max-w-[80px] sm:max-w-none">{customer.location}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                         customer.status === 'Active' 
                           ? 'bg-green-100 text-green-800' 
@@ -788,30 +789,30 @@ const Customers = () => {
                         {customer.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <div className="flex space-x-2">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
+                      <div className="flex space-x-1 sm:space-x-2">
                         <button 
                           onClick={() => handleViewCustomer(customer)}
-                          className="text-blue-600 hover:text-blue-900"
+                          className="text-blue-600 hover:text-blue-900 p-1"
                           title="View Details"
                         >
-                          <User size={16} />
+                          <User size={14} />
                         </button>
                         {editingCustomer === customer.id ? (
                           <button 
                             onClick={() => handleUpdateCustomer(customer.id)}
-                            className="text-green-600 hover:text-green-900"
+                            className="text-green-600 hover:text-green-900 p-1"
                             title="Save"
                           >
-                            <Save size={16} />
+                            <Save size={14} />
                           </button>
                         ) : (
                           <button 
                             onClick={() => handleEditCustomer(customer)}
-                            className="text-indigo-600 hover:text-indigo-900"
+                            className="text-indigo-600 hover:text-indigo-900 p-1"
                             title="Edit"
                           >
-                            <Edit2 size={16} />
+                            <Edit2 size={14} />
                           </button>
                         )}
                         <button 
@@ -820,17 +821,17 @@ const Customers = () => {
                             setShowWhatsAppModal(true)
                             setWhatsappMessage('')
                           }}
-                          className="text-green-600 hover:text-green-900"
+                          className="text-green-600 hover:text-green-900 p-1"
                           title="Send WhatsApp Message"
                         >
-                          <MessageCircle size={16} />
+                          <MessageCircle size={14} />
                         </button>
                         <button 
                           onClick={() => handleDelete(customer.id)}
-                          className="text-red-600 hover:text-red-900"
+                          className="text-red-600 hover:text-red-900 p-1"
                           title="Delete"
                         >
-                          <X size={16} />
+                          <X size={14} />
                         </button>
                       </div>
                     </td>
@@ -844,23 +845,23 @@ const Customers = () => {
 
       {/* Customer Details Modal */}
       {showCustomerModal && selectedCustomer && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold flex items-center">
-                <User className="mr-2 text-blue-600" size={24} />
-                Customer Details - {selectedCustomer.name}
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4 sm:mb-6">
+              <h2 className="text-lg sm:text-xl font-semibold flex items-center">
+                <User className="mr-2 text-blue-600" size={20} />
+                <span className="truncate max-w-[200px] sm:max-w-none">Customer Details - {selectedCustomer.name}</span>
               </h2>
               <button onClick={() => setShowCustomerModal(false)}>
-                <X size={20} className="text-gray-500" />
+                <X size={18} className="text-gray-500" />
               </button>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               {/* Customer Information */}
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-medium text-gray-900 mb-4">Customer Information</h3>
-                <div className="space-y-3 text-sm">
+              <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
+                <h3 className="font-medium text-gray-900 mb-3 sm:mb-4 text-sm sm:text-base">Customer Information</h3>
+                <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
                   <div><strong>Name:</strong> {selectedCustomer.name}</div>
                   <div><strong>Email:</strong> {selectedCustomer.email}</div>
                   <div><strong>Phone:</strong> {selectedCustomer.phone || 'Not provided'}</div>
@@ -872,9 +873,9 @@ const Customers = () => {
               </div>
 
               {/* Actions and Notes */}
-              <div className="space-y-4">
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <h3 className="font-medium text-blue-900 mb-3">Quick Actions</h3>
+              <div className="space-y-3 sm:space-y-4">
+                <div className="bg-blue-50 p-3 sm:p-4 rounded-lg">
+                  <h3 className="font-medium text-blue-900 mb-2 sm:mb-3 text-sm sm:text-base">Quick Actions</h3>
                   <div className="space-y-2">
                     <button
                       onClick={() => {
@@ -882,16 +883,16 @@ const Customers = () => {
                         setShowWhatsAppModal(true)
                         setWhatsappMessage('')
                       }}
-                      className="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 flex items-center justify-center"
+                      className="w-full px-3 sm:px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 flex items-center justify-center text-xs sm:text-sm"
                     >
-                      <MessageCircle size={16} className="mr-2" />
+                      <MessageCircle size={14} className="mr-2" />
                       Send WhatsApp Message
                     </button>
                     <button
                       onClick={() => window.open(`mailto:${selectedCustomer.email}`)}
-                      className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center justify-center"
+                      className="w-full px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center justify-center text-xs sm:text-sm"
                     >
-                      <Mail size={16} className="mr-2" />
+                      <Mail size={14} className="mr-2" />
                       Send Email
                     </button>
                     <button
@@ -901,23 +902,23 @@ const Customers = () => {
                         }
                       }}
                       disabled={!selectedCustomer.phone}
-                      className={`w-full px-4 py-2 rounded-md flex items-center justify-center ${
+                      className={`w-full px-3 sm:px-4 py-2 rounded-md flex items-center justify-center text-xs sm:text-sm ${
                         selectedCustomer.phone 
                           ? 'bg-purple-600 text-white hover:bg-purple-700' 
                           : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       }`}
                     >
-                      <Phone size={16} className="mr-2" />
+                      <Phone size={14} className="mr-2" />
                       Call Customer
                     </button>
                   </div>
                 </div>
 
-                <div className="bg-yellow-50 p-4 rounded-lg">
-                  <h3 className="font-medium text-yellow-900 mb-2">Customer Notes</h3>
+                <div className="bg-yellow-50 p-3 sm:p-4 rounded-lg">
+                  <h3 className="font-medium text-yellow-900 mb-2 text-sm sm:text-base">Customer Notes</h3>
                   <textarea
-                    className="w-full px-3 py-2 border border-yellow-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm"
-                    rows="4"
+                    className="w-full px-3 py-2 border border-yellow-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 text-xs sm:text-sm"
+                    rows="3 sm:rows-4"
                     placeholder="Add notes about this customer..."
                     onChange={(e) => {
                       const note = e.target.value
@@ -927,7 +928,7 @@ const Customers = () => {
                     }}
                   />
                   {customerNotes[selectedCustomer.id] && (
-                    <div className="mt-3 space-y-2">
+                    <div className="mt-2 sm:mt-3 space-y-2">
                       {customerNotes[selectedCustomer.id].map((note, index) => (
                         <div key={index} className="text-xs bg-yellow-100 p-2 rounded">
                           <div className="text-gray-700">{note.text}</div>
@@ -947,23 +948,23 @@ const Customers = () => {
 
       {/* WhatsApp Messaging Modal */}
       {showWhatsAppModal && selectedCustomer && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold flex items-center">
-                <MessageCircle className="mr-2 text-green-600" size={24} />
-                Send WhatsApp Message - {selectedCustomer.name}
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4 sm:mb-6">
+              <h2 className="text-lg sm:text-xl font-semibold flex items-center">
+                <MessageCircle className="mr-2 text-green-600" size={20} />
+                <span className="truncate max-w-[200px] sm:max-w-none">Send WhatsApp Message - {selectedCustomer.name}</span>
               </h2>
               <button onClick={() => setShowWhatsAppModal(false)}>
-                <X size={20} className="text-gray-500" />
+                <X size={18} className="text-gray-500" />
               </button>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               {/* Customer Information */}
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-medium text-gray-900 mb-4">Customer Information</h3>
-                <div className="space-y-2 text-sm">
+              <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
+                <h3 className="font-medium text-gray-900 mb-3 sm:mb-4 text-sm sm:text-base">Customer Information</h3>
+                <div className="space-y-2 text-xs sm:text-sm">
                   <div><strong>Name:</strong> {selectedCustomer.name}</div>
                   <div><strong>Email:</strong> {selectedCustomer.email}</div>
                   <div><strong>Phone:</strong> {selectedCustomer.phone || 'Not provided'}</div>
@@ -973,11 +974,11 @@ const Customers = () => {
               </div>
 
               {/* Message Composition */}
-              <div className="space-y-4">
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="font-medium text-gray-900 mb-4">Compose Message</h3>
+              <div className="space-y-3 sm:space-y-4">
+                <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
+                  <h3 className="font-medium text-gray-900 mb-3 sm:mb-4 text-sm sm:text-base">Compose Message</h3>
                   
-                  <div className="mb-4">
+                  <div className="mb-3 sm:mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Your Message
                     </label>
@@ -985,56 +986,56 @@ const Customers = () => {
                       value={whatsappMessage}
                       onChange={(e) => setWhatsappMessage(e.target.value)}
                       placeholder="Type your message here..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                      rows="4"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                      rows="3 sm:rows-4"
                     />
                   </div>
 
                   <button
                     onClick={handleSendWhatsAppMessage}
                     disabled={!selectedCustomer?.phone || !whatsappMessage.trim()}
-                    className={`w-full px-4 py-3 rounded-md flex items-center justify-center ${
+                    className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-md flex items-center justify-center text-xs sm:text-sm ${
                       selectedCustomer?.phone && whatsappMessage.trim()
                         ? 'bg-green-600 text-white hover:bg-green-700' 
                         : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
                   >
-                    <MessageCircle size={20} className="mr-2" />
+                    <MessageCircle size={16} className="mr-2" />
                     Send WhatsApp Message
                   </button>
                 </div>
 
                 {/* Message Suggestions */}
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <h3 className="font-medium text-blue-900 mb-3">Message Suggestions</h3>
+                <div className="bg-blue-50 p-3 sm:p-4 rounded-lg">
+                  <h3 className="font-medium text-blue-900 mb-2 sm:mb-3 text-sm sm:text-base">Message Suggestions</h3>
                   <div className="space-y-2">
                     <button
                       onClick={() => setMessageSuggestion(`Hi ${selectedCustomer.name}! 👋\n\nThank you for being a valued customer! We wanted to check in and see how everything is going with your recent purchases.\n\nIs there anything we can help you with or any questions you have?\n\nBest regards,\nCustomer Support Team`)}
-                      className="w-full text-left px-3 py-2 bg-white border border-blue-200 rounded-md hover:bg-blue-100 text-sm"
+                      className="w-full text-left px-2 sm:px-3 py-2 bg-white border border-blue-200 rounded-md hover:bg-blue-100 text-xs sm:text-sm"
                     >
                       🤝 Customer Check-in
                     </button>
                     <button
                       onClick={() => setMessageSuggestion(`Hi ${selectedCustomer.name}! 👋\n\nGreat news! We have some exciting new products/services that we think you'll love based on your purchase history.\n\nWould you be interested in learning more about our latest offerings?\n\nBest regards,\nSales Team`)}
-                      className="w-full text-left px-3 py-2 bg-white border border-blue-200 rounded-md hover:bg-blue-100 text-sm"
+                      className="w-full text-left px-2 sm:px-3 py-2 bg-white border border-blue-200 rounded-md hover:bg-blue-100 text-xs sm:text-sm"
                     >
                       🎯 New Product Announcement
                     </button>
                     <button
                       onClick={() => setMessageSuggestion(`Hi ${selectedCustomer.name}! 👋\n\nThis is a friendly reminder about any outstanding payments or upcoming renewals for your account.\n\nPlease let us know if you have any questions or need assistance with payment processing.\n\nThank you for your continued business!\n\nBilling Team`)}
-                      className="w-full text-left px-3 py-2 bg-white border border-blue-200 rounded-md hover:bg-blue-100 text-sm"
+                      className="w-full text-left px-2 sm:px-3 py-2 bg-white border border-blue-200 rounded-md hover:bg-blue-100 text-xs sm:text-sm"
                     >
                       💳 Payment Reminder
                     </button>
                     <button
                       onClick={() => setMessageSuggestion(`Hi ${selectedCustomer.name}! 👋\n\nWe hope you're having a great week! We wanted to personally reach out and see if there's anything we can do to improve your experience with our services.\n\nYour feedback is valuable to us!\n\nCustomer Success Team`)}
-                      className="w-full text-left px-3 py-2 bg-white border border-blue-200 rounded-md hover:bg-blue-100 text-sm"
+                      className="w-full text-left px-2 sm:px-3 py-2 bg-white border border-blue-200 rounded-md hover:bg-blue-100 text-xs sm:text-sm"
                     >
                       📞 Feedback Request
                     </button>
                     <button
                       onClick={() => setMessageSuggestion(`Hi ${selectedCustomer.name}! 👋\n\nSpecial offer just for you! As a valued customer, we'd like to offer you an exclusive discount on your next purchase.\n\nUse code: CUSTOMER10\n\nLimited time offer!\n\nMarketing Team`)}
-                      className="w-full text-left px-3 py-2 bg-white border border-blue-200 rounded-md hover:bg-blue-100 text-sm"
+                      className="w-full text-left px-2 sm:px-3 py-2 bg-white border border-blue-200 rounded-md hover:bg-blue-100 text-xs sm:text-sm"
                     >
                       🎁 Special Offer
                     </button>

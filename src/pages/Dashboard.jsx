@@ -377,22 +377,22 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen animate-fadeIn">
+    <div className="p-4 sm:p-6 bg-gray-50 min-h-screen animate-fadeIn">
       {/* Header Section */}
-      <div className="mb-8 animate-slideDown">
-        <div className="flex justify-between items-center">
+      <div className="mb-6 animate-slideDown">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <div>
-            <h1 className="text-4xl font-bold text-gray-800 animate-slideInLeft">Business Dashboard</h1>
-            <p className="text-gray-600 mt-2 animate-slideInLeft animation-delay-200">Real-time insights and performance metrics</p>
+            <h1 className="text-2xl sm:text-4xl font-bold text-gray-800 animate-slideInLeft">Business Dashboard</h1>
+            <p className="text-gray-600 mt-2 text-sm sm:text-base animate-slideInLeft animation-delay-200">Real-time insights and performance metrics</p>
           </div>
-          <div className="flex items-center gap-4 animate-slideInRight">
+          <div className="flex items-center gap-2 sm:gap-4 animate-slideInRight">
             {/* Time Range Selector */}
-            <div className="flex bg-white rounded-lg shadow-sm p-1 hover:shadow-lg transition-all duration-300">
+            <div className="flex bg-white rounded-lg shadow-sm p-1 hover:shadow-lg transition-all duration-300 overflow-x-auto max-w-full">
               {['week', 'month', 'quarter', 'year'].map((range, index) => (
                 <button
                   key={range}
                   onClick={() => setTimeRange(range)}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 transform hover:scale-105 ${
+                  className={`px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-all duration-300 transform hover:scale-105 whitespace-nowrap ${
                     timeRange === range 
                       ? 'bg-blue-500 text-white shadow-md' 
                       : 'text-gray-600 hover:text-gray-900'
@@ -420,7 +420,7 @@ const Dashboard = () => {
               
               {/* Notifications Dropdown */}
               {showNotifications && (
-                <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50 animate-slideDown">
+                <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50 animate-slideDown">
                   <div className="p-4 border-b border-gray-200">
                     <h3 className="font-semibold text-gray-800">Alerts & Notifications</h3>
                   </div>
@@ -452,14 +452,14 @@ const Dashboard = () => {
 
       {/* Alerts Section */}
       {alerts.length > 0 && (
-        <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4 animate-slideUp">
+        <div className="mb-4 sm:mb-6 grid grid-cols-1 gap-3 sm:gap-4 animate-slideUp">
           {alerts.map((alert, index) => (
-            <div key={alert.id} className="bg-white rounded-lg shadow-sm p-4 border-l-4 border-l-red-500 hover:shadow-lg transition-all duration-300 transform hover:scale-105 animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
+            <div key={alert.id} className="bg-white rounded-lg shadow-sm p-3 sm:p-4 border-l-4 border-l-red-500 hover:shadow-lg transition-all duration-300 transform hover:scale-105 animate-slideInUp" style={{ animationDelay: `${index * 100}ms` }}>
               <div className="flex items-center">
-                <alert.icon size={20} className={alert.color + ' mr-3 animate-pulse-slow'} />
-                <div>
-                  <h4 className="font-semibold text-gray-800">{alert.title}</h4>
-                  <p className="text-sm text-gray-600">{alert.message}</p>
+                <alert.icon size={18} className={alert.color + ' mr-3 animate-pulse-slow flex-shrink-0'} />
+                <div className="min-w-0 flex-1">
+                  <h4 className="font-semibold text-gray-800 text-sm sm:text-base">{alert.title}</h4>
+                  <p className="text-xs sm:text-sm text-gray-600">{alert.message}</p>
                 </div>
               </div>
             </div>
@@ -468,44 +468,44 @@ const Dashboard = () => {
       )}
 
       {/* Advanced KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
         {stats.map((stat, index) => {
           const Icon = stat.icon
           return (
-            <div key={index} className="bg-white rounded-xl shadow-sm p-6 hover:shadow-xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-1 animate-slideInUp" style={{ animationDelay: `${index * 150}ms` }}>
-              <div className="flex items-center justify-between mb-4">
-                <div className={`${stat.color} p-3 rounded-lg transform transition-all duration-300 hover:scale-110 hover:rotate-12`}>
-                  <Icon className="text-white animate-pulse-slow" size={24} />
+            <div key={index} className="bg-white rounded-xl shadow-sm p-4 sm:p-6 hover:shadow-xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-1 animate-slideInUp" style={{ animationDelay: `${index * 150}ms` }}>
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <div className={`${stat.color} p-2 sm:p-3 rounded-lg transform transition-all duration-300 hover:scale-110 hover:rotate-12`}>
+                  <Icon className="text-white animate-pulse-slow" size={20} />
                 </div>
-                <div className={`flex items-center text-sm ${
+                <div className={`flex items-center text-xs sm:text-sm ${
                   stat.changeType === 'positive' ? 'text-green-600' : 
                   stat.changeType === 'negative' ? 'text-red-600' : 'text-gray-600'
                 }`}>
                   {stat.changeType === 'positive' ? (
-                    <ArrowUpRight size={16} className="mr-1 animate-bounce" />
+                    <ArrowUpRight size={14} className="mr-1 animate-bounce" />
                   ) : stat.changeType === 'negative' ? (
-                    <ArrowDownRight size={16} className="mr-1 animate-bounce" />
+                    <ArrowDownRight size={14} className="mr-1 animate-bounce" />
                   ) : null}
                   <span className="font-semibold animate-fadeIn">{stat.change}</span>
                 </div>
               </div>
               
-              <h3 className="text-2xl font-bold text-gray-800 mb-1 animate-numberGrow">{stat.value}</h3>
-              <p className="text-gray-600 text-sm">{stat.title}</p>
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-1 animate-numberGrow">{stat.value}</h3>
+              <p className="text-gray-600 text-xs sm:text-sm">{stat.title}</p>
             </div>
           )
         })}
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Charts Section - 2 columns */}
-        <div className="lg:col-span-2 space-y-6">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
+        {/* Charts Section - 2 columns on xl, 1 on smaller */}
+        <div className="xl:col-span-2 space-y-4 sm:space-y-6">
           {/* Revenue Chart */}
-          <div className="bg-white rounded-xl shadow-sm p-6 hover:shadow-lg transition-all duration-300 animate-slideInLeft">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-gray-800">Revenue Overview</h2>
-              <div className="flex items-center text-sm">
+          <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 hover:shadow-lg transition-all duration-300 animate-slideInLeft">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-2">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-800">Revenue Overview</h2>
+              <div className="flex items-center text-xs sm:text-sm">
                 {analytics.monthOverMonthGrowth >= 0 ? (
                   <div className="text-green-600 flex items-center animate-pulse">
                     <TrendingUp size={16} className="mr-1" />
@@ -525,43 +525,43 @@ const Dashboard = () => {
           </div>
 
           {/* Performance Metrics */}
-          <div className="bg-white rounded-xl shadow-sm p-6 hover:shadow-lg transition-all duration-300 animate-slideInRight">
-            <h2 className="text-xl font-semibold text-gray-800 mb-6">Performance Metrics</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 hover:shadow-lg transition-all duration-300 animate-slideInRight">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6">Performance Metrics</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               {/* Conversion Funnel */}
               <div className="animate-slideInLeft animation-delay-200">
-                <h3 className="text-lg font-medium text-gray-700 mb-4">Conversion Funnel</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors duration-300 transform hover:scale-105">
-                    <span className="text-sm font-medium text-blue-900">Total Leads</span>
-                    <span className="text-lg font-bold text-blue-600 animate-numberGrow">{analytics.totalLeads}</span>
+                <h3 className="text-base sm:text-lg font-medium text-gray-700 mb-3 sm:mb-4">Conversion Funnel</h3>
+                <div className="space-y-2 sm:space-y-3">
+                  <div className="flex items-center justify-between p-2 sm:p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors duration-300 transform hover:scale-105">
+                    <span className="text-xs sm:text-sm font-medium text-blue-900">Total Leads</span>
+                    <span className="text-sm sm:text-lg font-bold text-blue-600 animate-numberGrow">{analytics.totalLeads}</span>
                   </div>
-                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors duration-300 transform hover:scale-105">
-                    <span className="text-sm font-medium text-green-900">Active Leads</span>
-                    <span className="text-lg font-bold text-green-600 animate-numberGrow">{analytics.activeLeads}</span>
+                  <div className="flex items-center justify-between p-2 sm:p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors duration-300 transform hover:scale-105">
+                    <span className="text-xs sm:text-sm font-medium text-green-900">Active Leads</span>
+                    <span className="text-sm sm:text-lg font-bold text-green-600 animate-numberGrow">{analytics.activeLeads}</span>
                   </div>
-                  <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors duration-300 transform hover:scale-105">
-                    <span className="text-sm font-medium text-purple-900">Converted</span>
-                    <span className="text-lg font-bold text-purple-600 animate-numberGrow">{Math.round(analytics.totalLeads * analytics.leadConversionRate / 100)}</span>
+                  <div className="flex items-center justify-between p-2 sm:p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors duration-300 transform hover:scale-105">
+                    <span className="text-xs sm:text-sm font-medium text-purple-900">Converted</span>
+                    <span className="text-sm sm:text-lg font-bold text-purple-600 animate-numberGrow">{Math.round(analytics.totalLeads * analytics.leadConversionRate / 100)}</span>
                   </div>
                 </div>
               </div>
 
               {/* Task Performance */}
               <div className="animate-slideInRight animation-delay-400">
-                <h3 className="text-lg font-medium text-gray-700 mb-4">Task Performance</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors duration-300 transform hover:scale-105">
-                    <span className="text-sm font-medium text-green-900">Completed</span>
-                    <span className="text-lg font-bold text-green-600 animate-numberGrow">{analytics.completedTasks}</span>
+                <h3 className="text-base sm:text-lg font-medium text-gray-700 mb-3 sm:mb-4">Task Performance</h3>
+                <div className="space-y-2 sm:space-y-3">
+                  <div className="flex items-center justify-between p-2 sm:p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors duration-300 transform hover:scale-105">
+                    <span className="text-xs sm:text-sm font-medium text-green-900">Completed</span>
+                    <span className="text-sm sm:text-lg font-bold text-green-600 animate-numberGrow">{analytics.completedTasks}</span>
                   </div>
-                  <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors duration-300 transform hover:scale-105">
-                    <span className="text-sm font-medium text-yellow-900">Pending</span>
-                    <span className="text-lg font-bold text-yellow-600 animate-numberGrow">{analytics.pendingTasks}</span>
+                  <div className="flex items-center justify-between p-2 sm:p-3 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors duration-300 transform hover:scale-105">
+                    <span className="text-xs sm:text-sm font-medium text-yellow-900">Pending</span>
+                    <span className="text-sm sm:text-lg font-bold text-yellow-600 animate-numberGrow">{analytics.pendingTasks}</span>
                   </div>
-                  <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg hover:bg-red-100 transition-colors duration-300 transform hover:scale-105">
-                    <span className="text-sm font-medium text-red-900">Overdue</span>
-                    <span className="text-lg font-bold text-red-600 animate-numberGrow">{analytics.overdueTasks}</span>
+                  <div className="flex items-center justify-between p-2 sm:p-3 bg-red-50 rounded-lg hover:bg-red-100 transition-colors duration-300 transform hover:scale-105">
+                    <span className="text-xs sm:text-sm font-medium text-red-900">Overdue</span>
+                    <span className="text-sm sm:text-lg font-bold text-red-600 animate-numberGrow">{analytics.overdueTasks}</span>
                   </div>
                 </div>
               </div>
@@ -570,26 +570,26 @@ const Dashboard = () => {
 
           {/* Top Products */}
           {analytics.topProducts && analytics.topProducts.length > 0 && (
-            <div className="bg-white rounded-xl shadow-sm p-6 hover:shadow-lg transition-all duration-300 animate-slideInUp animation-delay-500">
-              <h2 className="text-xl font-semibold text-gray-800 mb-6">Top Products</h2>
-              <div className="space-y-3">
+            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 hover:shadow-lg transition-all duration-300 animate-slideInUp animation-delay-500">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6">Top Products</h2>
+              <div className="space-y-2 sm:space-y-3">
                 {analytics.topProducts.map((product, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 hover:translate-x-2 animate-slideInLeft" style={{ animationDelay: `${index * 100}ms` }}>
-                    <div className="flex items-center">
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 transform transition-all duration-300 hover:scale-120 hover:rotate-12 ${
+                  <div key={index} className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 hover:translate-x-2 animate-slideInLeft" style={{ animationDelay: `${index * 100}ms` }}>
+                    <div className="flex items-center min-w-0 flex-1">
+                      <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center mr-2 sm:mr-3 transform transition-all duration-300 hover:scale-120 hover:rotate-12 flex-shrink-0 ${
                         index === 0 ? 'bg-yellow-500 animate-pulse-slow' : 
                         index === 1 ? 'bg-gray-400' : 
                         index === 2 ? 'bg-orange-400' : 'bg-gray-300'
                       }`}>
-                        <span className="text-white text-sm font-bold">{index + 1}</span>
+                        <span className="text-white text-xs sm:text-sm font-bold">{index + 1}</span>
                       </div>
-                      <div>
-                        <div className="font-medium text-gray-900">{product.product}</div>
+                      <div className="min-w-0 flex-1">
+                        <div className="font-medium text-gray-900 text-sm sm:text-base truncate">{product.product}</div>
                         <div className="text-xs text-gray-500">{product.count} orders</div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="font-semibold text-gray-900 animate-numberGrow">₹{product.revenue.toLocaleString('en-IN')}</div>
+                    <div className="text-right ml-2">
+                      <div className="font-semibold text-gray-900 text-sm sm:text-base animate-numberGrow">₹{product.revenue.toLocaleString('en-IN')}</div>
                     </div>
                   </div>
                 ))}
@@ -599,56 +599,56 @@ const Dashboard = () => {
         </div>
 
         {/* Right Sidebar - 1 column */}
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* Quick Actions */}
-          <div className="bg-white rounded-xl shadow-sm p-6 hover:shadow-lg transition-all duration-300 animate-slideInRight animation-delay-600">
-            <h2 className="text-xl font-semibold text-gray-800 mb-6">Quick Actions</h2>
-            <div className="space-y-3">
+          <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 hover:shadow-lg transition-all duration-300 animate-slideInRight animation-delay-600">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6">Quick Actions</h2>
+            <div className="space-y-2 sm:space-y-3">
               <button 
                 onClick={handleAddLead}
-                className="w-full flex items-center justify-center p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg animate-pulse-slow"
+                className="w-full flex items-center justify-center p-2 sm:p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg animate-pulse-slow text-sm sm:text-base"
               >
-                <Plus size={18} className="mr-2" />
+                <Plus size={16} className="mr-2" />
                 Add New Lead
               </button>
               <button 
                 onClick={handleCreateSale}
-                className="w-full flex items-center justify-center p-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg animate-pulse-slow" 
+                className="w-full flex items-center justify-center p-2 sm:p-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg animate-pulse-slow text-sm sm:text-base" 
                 style={{ animationDelay: '200ms' }}
               >
-                <ShoppingCart size={18} className="mr-2" />
+                <ShoppingCart size={16} className="mr-2" />
                 Create Sale
               </button>
               <button 
                 onClick={handleAddTask}
-                className="w-full flex items-center justify-center p-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg animate-pulse-slow" 
+                className="w-full flex items-center justify-center p-2 sm:p-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg animate-pulse-slow text-sm sm:text-base" 
                 style={{ animationDelay: '400ms' }}
               >
-                <CheckCircle size={18} className="mr-2" />
+                <CheckCircle size={16} className="mr-2" />
                 Add Task
               </button>
             </div>
           </div>
 
           {/* Recent Activity */}
-          <div className="bg-white rounded-xl shadow-sm p-6 hover:shadow-lg transition-all duration-300 animate-slideInRight animation-delay-800">
-            <h2 className="text-xl font-semibold text-gray-800 mb-6">Recent Activity</h2>
-            <div className="space-y-4 max-h-96 overflow-y-auto">
+          <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 hover:shadow-lg transition-all duration-300 animate-slideInRight animation-delay-800">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6">Recent Activity</h2>
+            <div className="space-y-3 sm:space-y-4 max-h-64 sm:max-h-96 overflow-y-auto">
               {recentActivities.length > 0 ? (
                 recentActivities.map((activity, index) => (
-                  <div key={activity.id} className="flex items-start p-3 hover:bg-gray-50 rounded-lg transition-all duration-300 transform hover:scale-105 hover:translate-x-1 animate-slideInLeft" style={{ animationDelay: `${index * 100}ms` }}>
-                    <activity.icon size={16} className={activity.color + ' mt-1 mr-3 animate-pulse-slow'} />
-                    <div className="flex-1">
-                      <h4 className="font-medium text-gray-800 text-sm">{activity.title}</h4>
-                      <p className="text-xs text-gray-600 mt-1">{activity.description}</p>
-                      <p className="text-xs text-gray-500 mt-2">
+                  <div key={activity.id} className="flex items-start p-2 sm:p-3 hover:bg-gray-50 rounded-lg transition-all duration-300 transform hover:scale-105 hover:translate-x-1 animate-slideInLeft" style={{ animationDelay: `${index * 100}ms` }}>
+                    <activity.icon size={14} className={activity.color + ' mt-1 mr-2 sm:mr-3 animate-pulse-slow flex-shrink-0'} />
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium text-gray-800 text-xs sm:text-sm truncate">{activity.title}</h4>
+                      <p className="text-xs text-gray-600 mt-1 line-clamp-2">{activity.description}</p>
+                      <p className="text-xs text-gray-500 mt-1 sm:mt-2">
                         {new Date(activity.time).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="text-center text-gray-500 py-8 animate-fadeIn">
+                <div className="text-center text-gray-500 py-6 sm:py-8 animate-fadeIn">
                   No recent activity
                 </div>
               )}

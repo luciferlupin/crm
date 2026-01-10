@@ -308,36 +308,38 @@ const Tasks = () => {
   }
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-8">
+    <div className="p-4 sm:p-6 lg:p-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Tasks</h1>
-          <p className="text-gray-600 mt-2">Manage your team's tasks and deadlines</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Tasks</h1>
+          <p className="text-gray-600 mt-2 text-sm sm:text-base">Manage your team's tasks and deadlines</p>
         </div>
         <div className="flex gap-2">
           <button 
             onClick={() => setShowAddForm(true)}
-            className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center"
+            className="bg-primary-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center text-sm sm:text-base"
             data-add-task-btn
           >
-            <Plus size={20} className="mr-2" />
-            Add Task
+            <Plus size={16} className="mr-2" />
+            <span className="hidden sm:inline">Add Task</span>
+            <span className="sm:hidden">Add</span>
           </button>
         </div>
       </div>
 
       {/* View Mode Selector */}
-      <div className="flex gap-2 mb-6">
+      <div className="flex gap-1 sm:gap-2 mb-4 sm:mb-6 overflow-x-auto">
         {viewModes.map(mode => (
           <button
             key={mode.value}
             onClick={() => setViewMode(mode.value)}
-            className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+            className={`px-2 sm:px-4 py-2 rounded-lg transition-colors flex items-center gap-1 sm:gap-2 text-xs sm:text-sm whitespace-nowrap ${
               viewMode === mode.value ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            <mode.icon size={16} />
-            {mode.label}
+            <mode.icon size={14} />
+            <span className="hidden sm:inline">{mode.label}</span>
+            <span className="sm:hidden">{mode.label.split(' ')[0]}</span>
           </button>
         ))}
       </div>
@@ -346,55 +348,55 @@ const Tasks = () => {
       {viewMode === 'analytics' && (
         <div className="space-y-6">
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Total Tasks</p>
-                  <p className="text-2xl font-bold text-gray-800">{taskStats.total}</p>
+                  <p className="text-xs sm:text-sm text-gray-600">Total Tasks</p>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-800">{taskStats.total}</p>
                 </div>
-                <Target className="text-blue-500" size={24} />
+                <Target className="text-blue-500" size={18} />
               </div>
             </div>
-            <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Completion Rate</p>
-                  <p className="text-2xl font-bold text-green-600">{taskStats.completionRate}%</p>
+                  <p className="text-xs sm:text-sm text-gray-600">Completion Rate</p>
+                  <p className="text-xl sm:text-2xl font-bold text-green-600">{taskStats.completionRate}%</p>
                 </div>
-                <TrendingUp className="text-green-500" size={24} />
+                <TrendingUp className="text-green-500" size={18} />
               </div>
             </div>
-            <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Overdue Tasks</p>
-                  <p className="text-2xl font-bold text-red-600">{taskStats.overdue}</p>
+                  <p className="text-xs sm:text-sm text-gray-600">Overdue Tasks</p>
+                  <p className="text-xl sm:text-2xl font-bold text-red-600">{taskStats.overdue}</p>
                 </div>
-                <AlertTriangle className="text-red-500" size={24} />
+                <AlertTriangle className="text-red-500" size={18} />
               </div>
             </div>
-            <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">High Priority</p>
-                  <p className="text-2xl font-bold text-orange-600">{taskStats.highPriorityTasks}</p>
+                  <p className="text-xs sm:text-sm text-gray-600">High Priority</p>
+                  <p className="text-xl sm:text-2xl font-bold text-orange-600">{taskStats.highPriorityTasks}</p>
                 </div>
-                <AlertCircle className="text-orange-500" size={24} />
+                <AlertCircle className="text-orange-500" size={18} />
               </div>
             </div>
           </div>
 
           {/* Progress Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <Activity size={20} className="text-blue-600" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+              <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2">
+                <Activity size={16} className="text-blue-600" />
                 Task Status Distribution
               </h3>
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <div>
-                  <div className="flex justify-between text-sm mb-1">
+                  <div className="flex justify-between text-xs sm:text-sm mb-1">
                     <span>To Do</span>
                     <span>{taskStats.todo}</span>
                   </div>
@@ -406,7 +408,7 @@ const Tasks = () => {
                   </div>
                 </div>
                 <div>
-                  <div className="flex justify-between text-sm mb-1">
+                  <div className="flex justify-between text-xs sm:text-sm mb-1">
                     <span>In Progress</span>
                     <span>{taskStats.inProgress}</span>
                   </div>
@@ -418,7 +420,7 @@ const Tasks = () => {
                   </div>
                 </div>
                 <div>
-                  <div className="flex justify-between text-sm mb-1">
+                  <div className="flex justify-between text-xs sm:text-sm mb-1">
                     <span>Overdue</span>
                     <span>{taskStats.overdue}</span>
                   </div>
@@ -430,7 +432,7 @@ const Tasks = () => {
                   </div>
                 </div>
                 <div>
-                  <div className="flex justify-between text-sm mb-1">
+                  <div className="flex justify-between text-xs sm:text-sm mb-1">
                     <span>Completed</span>
                     <span>{taskStats.completed}</span>
                   </div>
@@ -444,27 +446,27 @@ const Tasks = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <Users size={20} className="text-purple-600" />
+            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+              <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2">
+                <Users size={16} className="text-purple-600" />
                 Team Performance
               </h3>
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">High Priority Tasks</span>
-                  <span className="font-semibold">{taskStats.highPriorityTasks}</span>
+                  <span className="text-xs sm:text-sm text-gray-600">High Priority Tasks</span>
+                  <span className="text-sm sm:text-base font-semibold">{taskStats.highPriorityTasks}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Total Estimated Hours</span>
-                  <span className="font-semibold">{taskStats.totalEstimatedHours}h</span>
+                  <span className="text-xs sm:text-sm text-gray-600">Total Estimated Hours</span>
+                  <span className="text-sm sm:text-base font-semibold">{taskStats.totalEstimatedHours}h</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Total Actual Hours</span>
-                  <span className="font-semibold">{taskStats.totalActualHours}h</span>
+                  <span className="text-xs sm:text-sm text-gray-600">Total Actual Hours</span>
+                  <span className="text-sm sm:text-base font-semibold">{taskStats.totalActualHours}h</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Efficiency Rate</span>
-                  <span className="font-semibold">
+                  <span className="text-xs sm:text-sm text-gray-600">Efficiency Rate</span>
+                  <span className="text-sm sm:text-base font-semibold">
                     {taskStats.totalEstimatedHours > 0 ? 
                       Math.round((taskStats.totalEstimatedHours / taskStats.totalActualHours) * 100) : 0}%
                   </span>
@@ -477,7 +479,7 @@ const Tasks = () => {
 
       {/* Kanban View */}
       {viewMode === 'kanban' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           {Object.entries(kanbanTasks).map(([status, statusTasks]) => (
             <div 
               key={status} 
@@ -489,20 +491,20 @@ const Tasks = () => {
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, status)}
             >
-              <div className="p-4 border-b border-gray-200">
-                <h3 className="font-semibold capitalize flex items-center gap-2">
+              <div className="p-3 sm:p-4 border-b border-gray-200">
+                <h3 className="text-sm sm:text-base font-semibold capitalize flex items-center gap-2">
                   {getStatusIcon(status)}
-                  {status.replace('-', ' ')} ({statusTasks.length})
+                  <span className="truncate">{status.replace('-', ' ')} ({statusTasks.length})</span>
                 </h3>
               </div>
-              <div className="p-4 space-y-3 min-h-[400px]">
+              <div className="p-3 sm:p-4 space-y-2 sm:space-y-3 min-h-[300px] sm:min-h-[400px]">
                 {statusTasks.length === 0 ? (
-                  <div className="text-center py-8 text-gray-400">
+                  <div className="text-center py-6 sm:py-8 text-gray-400">
                     <div className="flex flex-col items-center gap-2">
-                      <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                      <div className="w-8 h-8 sm:w-12 sm:h-12 bg-gray-100 rounded-full flex items-center justify-center">
                         {getStatusIcon(status)}
                       </div>
-                      <p className="text-sm">No tasks in {status.replace('-', ' ')}</p>
+                      <p className="text-xs sm:text-sm">No tasks in {status.replace('-', ' ')}</p>
                       <p className="text-xs">Drag tasks here</p>
                     </div>
                   </div>
@@ -513,15 +515,15 @@ const Tasks = () => {
                       draggable
                       onDragStart={(e) => handleDragStart(e, task)}
                       onDragEnd={handleDragEnd}
-                      className={`bg-gray-50 rounded-lg p-4 hover:shadow-md transition-all duration-200 cursor-move border-2 border-transparent hover:border-gray-300 ${
+                      className={`bg-gray-50 rounded-lg p-3 sm:p-4 hover:shadow-md transition-all duration-200 cursor-move border-2 border-transparent hover:border-gray-300 ${
                         draggedTask?.id === task.id ? 'opacity-50 rotate-2' : ''
                       }`}
                       onClick={() => handleEdit(task)}
                     >
                       <div className="flex items-start justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <GripVertical size={14} className="text-gray-400" />
-                          <h4 className="font-medium text-gray-900">{task.title}</h4>
+                        <div className="flex items-center gap-1 sm:gap-2">
+                          <GripVertical size={12} className="text-gray-400" />
+                          <h4 className="text-xs sm:text-sm font-medium text-gray-900 truncate max-w-[120px] sm:max-w-none">{task.title}</h4>
                         </div>
                         <button
                           onClick={(e) => {
@@ -530,18 +532,19 @@ const Tasks = () => {
                           }}
                           className="text-red-600 hover:text-red-900 opacity-0 hover:opacity-100 transition-opacity"
                         >
-                          <Trash2 size={16} />
+                          <Trash2 size={12} />
                         </button>
                       </div>
-                      <p className="text-sm text-gray-600 mb-3 line-clamp-2">{task.description}</p>
+                      <p className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3 line-clamp-2">{task.description}</p>
                       <div className="flex items-center justify-between">
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(task.priority)}`}>
+                        <span className={`px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs font-medium rounded-full ${getPriorityColor(task.priority)}`}>
                           {task.priority}
                         </span>
                         {task.dueDate && (
                           <div className="flex items-center text-xs text-gray-500">
-                            <Calendar size={12} className="mr-1" />
-                            {new Date(task.dueDate).toLocaleDateString()}
+                            <Calendar size={10} className="mr-1" />
+                            <span className="hidden sm:inline">{new Date(task.dueDate).toLocaleDateString()}</span>
+                            <span className="sm:hidden">{new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                           </div>
                         )}
                       </div>
@@ -873,54 +876,54 @@ const Tasks = () => {
           )}
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">To Do</p>
-                  <p className="text-2xl font-bold text-gray-800">{taskStats.todo}</p>
+                  <p className="text-xs sm:text-sm text-gray-600">To Do</p>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-800">{taskStats.todo}</p>
                 </div>
-                <Circle className="text-gray-400" size={24} />
+                <Circle className="text-gray-400" size={18} />
               </div>
             </div>
-            <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Completed</p>
-                  <p className="text-2xl font-bold text-gray-800">{taskStats.completed}</p>
+                  <p className="text-xs sm:text-sm text-gray-600">Completed</p>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-800">{taskStats.completed}</p>
                 </div>
-                <CheckCircle className="text-green-500" size={24} />
+                <CheckCircle className="text-green-500" size={18} />
               </div>
             </div>
-            <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Overdue</p>
-                  <p className="text-2xl font-bold text-red-600">{taskStats.overdue}</p>
+                  <p className="text-xs sm:text-sm text-gray-600">Overdue</p>
+                  <p className="text-xl sm:text-2xl font-bold text-red-600">{taskStats.overdue}</p>
                 </div>
-                <Clock className="text-red-500" size={24} />
+                <Clock className="text-red-500" size={18} />
               </div>
             </div>
           </div>
 
           {/* Filters */}
           <div className="bg-white rounded-xl shadow-sm">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex flex-col sm:flex-row gap-4">
+            <div className="p-4 sm:p-6 border-b border-gray-200">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
                   <input
                     type="text"
                     placeholder="Search tasks..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                   />
                 </div>
                 <select
                   value={filterPriority}
                   onChange={(e) => setFilterPriority(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                 >
                   <option value="all">All Priority</option>
                   <option value="high">High</option>
@@ -930,7 +933,7 @@ const Tasks = () => {
                 <select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                 >
                   <option value="all">All Status</option>
                   {statusOptions.map(option => (
@@ -945,17 +948,17 @@ const Tasks = () => {
             {/* Task List */}
             <div className="divide-y divide-gray-200">
               {filteredTasks.length === 0 ? (
-                <div className="p-12 text-center">
+                <div className="p-8 sm:p-12 text-center">
                   <div className="text-gray-500">
-                    <CheckCircle className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                    <p>No tasks found</p>
-                    <p className="text-sm mt-1">Add your first task to get started</p>
+                    <CheckCircle className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4 text-gray-300" />
+                    <p className="text-sm sm:text-base">No tasks found</p>
+                    <p className="text-xs sm:text-sm mt-1">Add your first task to get started</p>
                   </div>
                 </div>
               ) : (
                 filteredTasks.map((task) => (
-                  <div key={task.id} className="p-6 hover:bg-gray-50 transition-colors">
-                    <div className="flex items-start space-x-4">
+                  <div key={task.id} className="p-4 sm:p-6 hover:bg-gray-50 transition-colors">
+                    <div className="flex items-start space-x-3 sm:space-x-4">
                       <button 
                         onClick={() => handleStatusToggle(task.id, task.status)}
                         className="mt-1"
@@ -963,46 +966,49 @@ const Tasks = () => {
                         {getStatusIcon(task.status)}
                       </button>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className="text-lg font-medium text-gray-900">{task.title}</h3>
-                          <div className="flex items-center space-x-2">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2">
+                          <h3 className="text-base sm:text-lg font-medium text-gray-900 truncate max-w-[200px] sm:max-w-none">{task.title}</h3>
+                          <div className="flex items-center space-x-1 sm:space-x-2">
                             <button
                               onClick={() => handleEdit(task)}
                               className="text-blue-600 hover:text-blue-900"
                             >
-                              <Edit2 size={16} />
+                              <Edit2 size={14} />
                             </button>
                             <button 
                               onClick={() => handleDelete(task.id)}
                               className="text-red-600 hover:text-red-900"
                             >
-                              <Trash2 size={16} />
+                              <Trash2 size={14} />
                             </button>
                           </div>
                         </div>
-                        <p className="text-gray-600 mb-3">{task.description}</p>
-                        <div className="flex items-center space-x-4 text-sm text-gray-500">
+                        <p className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3 line-clamp-2">{task.description}</p>
+                        <div className="flex flex-col sm:flex-row sm:items-center space-x-0 sm:space-x-4 text-xs sm:text-sm text-gray-500 gap-2">
                           <div className="flex items-center">
-                            <Calendar size={16} className="mr-1" />
-                            Due: {task.dueDate || 'No due date'}
+                            <Calendar size={14} className="mr-1" />
+                            <span className="hidden sm:inline">Due: {task.dueDate || 'No due date'}</span>
+                            <span className="sm:hidden">{task.dueDate ? new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'No due date'}</span>
                           </div>
                           <div className="flex items-center">
-                            <User size={16} className="mr-1" />
-                            {task.assignedTo || 'Unassigned'}
+                            <User size={14} className="mr-1" />
+                            <span className="truncate max-w-[100px] sm:max-w-none">{task.assignedTo || 'Unassigned'}</span>
                           </div>
                           {task.estimatedHours && (
                             <div className="flex items-center">
-                              <Clock size={16} className="mr-1" />
-                              Est: {task.estimatedHours}h
+                              <Clock size={14} className="mr-1" />
+                              <span className="hidden sm:inline">Est: {task.estimatedHours}h</span>
+                              <span className="sm:hidden">{task.estimatedHours}h</span>
                             </div>
                           )}
                         </div>
-                        <div className="flex items-center space-x-2 mt-2">
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(task.priority)}`}>
+                        <div className="flex items-center space-x-1 sm:space-x-2 mt-2">
+                          <span className={`px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs font-medium rounded-full ${getPriorityColor(task.priority)}`}>
                             {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
                           </span>
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${getCategoryColor(task.category)}`}>
-                            {task.category}
+                          <span className={`px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs font-medium rounded-full ${getCategoryColor(task.category)}`}>
+                            <span className="hidden sm:inline">{task.category}</span>
+                            <span className="sm:hidden truncate max-w-[80px]">{task.category}</span>
                           </span>
                         </div>
                       </div>

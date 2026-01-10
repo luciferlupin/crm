@@ -409,31 +409,33 @@ const Sales = () => {
     )
   }
       return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-8">
+    <div className="p-4 sm:p-6 lg:p-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Sales Analytics</h1>
-          <p className="text-gray-600 mt-2">Track your sales performance and revenue</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Sales Analytics</h1>
+          <p className="text-gray-600 mt-2 text-sm sm:text-base">Track your sales performance and revenue</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           <button 
             onClick={() => setShowAnalytics(!showAnalytics)}
-            className={`px-4 py-2 rounded-lg transition-colors flex items-center ${
+            className={`px-3 sm:px-4 py-2 rounded-lg transition-colors flex items-center justify-center text-sm sm:text-base ${
               showAnalytics 
                 ? 'bg-primary-600 text-white hover:bg-primary-700' 
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            <BarChart3 size={20} className="mr-2" />
-            {showAnalytics ? 'Hide Analytics' : 'Show Analytics'}
+            <BarChart3 size={18} className="mr-2" />
+            <span className="hidden sm:inline">{showAnalytics ? 'Hide Analytics' : 'Show Analytics'}</span>
+            <span className="sm:hidden">{showAnalytics ? 'Hide' : 'Show'}</span>
           </button>
           <button 
             onClick={() => setShowAddForm(!showAddForm)}
-            className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center"
+            className="bg-primary-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center justify-center text-sm sm:text-base"
             data-add-sale-btn
           >
-            <Plus size={20} className="mr-2" />
-            Add Sale
+            <Plus size={18} className="mr-2" />
+            <span className="hidden sm:inline">Add Sale</span>
+            <span className="sm:hidden">Add</span>
           </button>
         </div>
       </div>
@@ -446,86 +448,86 @@ const Sales = () => {
             return (
               <>
                 {/* Key Performance Metrics */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <div className="bg-white rounded-xl shadow-sm p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="bg-green-500 p-3 rounded-lg">
-                        <IndianRupee className="text-white" size={24} />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                  <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+                    <div className="flex items-center justify-between mb-3 sm:mb-4">
+                      <div className="bg-green-500 p-2 sm:p-3 rounded-lg">
+                        <IndianRupee className="text-white" size={18} />
                       </div>
-                      <div className="flex items-center text-sm">
+                      <div className="flex items-center text-xs sm:text-sm">
                         {analytics.monthOverMonthGrowth >= 0 ? (
                           <div className="text-green-600 flex items-center">
-                            <TrendingUp size={16} className="mr-1" />
+                            <TrendingUp size={14} className="mr-1" />
                             +{analytics.monthOverMonthGrowth.toFixed(1)}%
                           </div>
                         ) : (
                           <div className="text-red-600 flex items-center">
-                            <TrendingDown size={16} className="mr-1" />
+                            <TrendingDown size={14} className="mr-1" />
                             {analytics.monthOverMonthGrowth.toFixed(1)}%
                           </div>
                         )}
                       </div>
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-800">₹{analytics.totalRevenue.toLocaleString('en-IN')}</h3>
-                    <p className="text-gray-600 text-sm mt-1">Total Revenue</p>
+                    <h3 className="text-xl sm:text-2xl font-bold text-gray-800">₹{analytics.totalRevenue.toLocaleString('en-IN')}</h3>
+                    <p className="text-gray-600 text-xs sm:text-sm mt-1">Total Revenue</p>
                   </div>
 
-                  <div className="bg-white rounded-xl shadow-sm p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="bg-blue-500 p-3 rounded-lg">
-                        <ShoppingCart className="text-white" size={24} />
+                  <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+                    <div className="flex items-center justify-between mb-3 sm:mb-4">
+                      <div className="bg-blue-500 p-2 sm:p-3 rounded-lg">
+                        <ShoppingCart className="text-white" size={18} />
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-xs sm:text-sm text-gray-600">
                         {analytics.conversionRate.toFixed(1)}% conv.
                       </div>
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-800">{analytics.completedOrders}</h3>
-                    <p className="text-gray-600 text-sm mt-1">Completed Orders</p>
+                    <h3 className="text-xl sm:text-2xl font-bold text-gray-800">{analytics.completedOrders}</h3>
+                    <p className="text-gray-600 text-xs sm:text-sm mt-1">Completed Orders</p>
                   </div>
 
-                  <div className="bg-white rounded-xl shadow-sm p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="bg-purple-500 p-3 rounded-lg">
-                        <Target className="text-white" size={24} />
+                  <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+                    <div className="flex items-center justify-between mb-3 sm:mb-4">
+                      <div className="bg-purple-500 p-2 sm:p-3 rounded-lg">
+                        <Target className="text-white" size={18} />
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-xs sm:text-sm text-gray-600">
                         {analytics.pendingOrders} pending
                       </div>
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-800">₹{Math.round(analytics.averageOrderValue).toLocaleString('en-IN')}</h3>
-                    <p className="text-gray-600 text-sm mt-1">Avg Order Value</p>
+                    <h3 className="text-xl sm:text-2xl font-bold text-gray-800">₹{Math.round(analytics.averageOrderValue).toLocaleString('en-IN')}</h3>
+                    <p className="text-gray-600 text-xs sm:text-sm mt-1">Avg Order Value</p>
                   </div>
 
-                  <div className="bg-white rounded-xl shadow-sm p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="bg-yellow-500 p-3 rounded-lg">
-                        <Activity className="text-white" size={24} />
+                  <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+                    <div className="flex items-center justify-between mb-3 sm:mb-4">
+                      <div className="bg-yellow-500 p-2 sm:p-3 rounded-lg">
+                        <Activity className="text-white" size={18} />
                       </div>
-                      <div className="text-sm text-red-600">
+                      <div className="text-xs sm:text-sm text-red-600">
                         {analytics.cancellationRate.toFixed(1)}% cancel
                       </div>
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-800">{analytics.totalOrders}</h3>
-                    <p className="text-gray-600 text-sm mt-1">Total Orders</p>
+                    <h3 className="text-xl sm:text-2xl font-bold text-gray-800">{analytics.totalOrders}</h3>
+                    <p className="text-gray-600 text-xs sm:text-sm mt-1">Total Orders</p>
                   </div>
                 </div>
 
                 {/* Sales Trends and Performance */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="bg-white rounded-xl shadow-sm p-6">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
-                      <TrendingUp size={20} className="mr-2 text-blue-600" />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                  <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+                    <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6 flex items-center">
+                      <TrendingUp size={18} className="mr-2 text-blue-600" />
                       Monthly Revenue Trends
                     </h2>
-                    <div className="space-y-3">
+                    <div className="space-y-2 sm:space-y-3">
                       {analytics.monthlyTrends.map((month, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div key={index} className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 rounded-lg">
                           <div>
-                            <div className="text-sm font-medium text-gray-900">{month.month}</div>
+                            <div className="text-xs sm:text-sm font-medium text-gray-900">{month.month}</div>
                             <div className="text-xs text-gray-500">{month.count} orders</div>
                           </div>
                           <div className="text-right">
-                            <div className="text-sm font-semibold text-gray-900">₹{month.revenue.toLocaleString('en-IN')}</div>
+                            <div className="text-xs sm:text-sm font-semibold text-gray-900">₹{month.revenue.toLocaleString('en-IN')}</div>
                             <div className="text-xs text-gray-500">
                               ₹{month.count > 0 ? Math.round(month.revenue / month.count).toLocaleString('en-IN') : 0} avg
                             </div>
@@ -535,50 +537,50 @@ const Sales = () => {
                     </div>
                   </div>
 
-                  <div className="bg-white rounded-xl shadow-sm p-6">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
-                      <PieChart size={20} className="mr-2 text-green-600" />
+                  <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+                    <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6 flex items-center">
+                      <PieChart size={18} className="mr-2 text-green-600" />
                       Order Status Distribution
                     </h2>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                    <div className="space-y-3 sm:space-y-4">
+                      <div className="flex items-center justify-between p-2 sm:p-3 bg-green-50 rounded-lg">
                         <div className="flex items-center">
-                          <div className="w-3 h-3 bg-green-500 rounded-full mr-3" />
+                          <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-500 rounded-full mr-2 sm:mr-3" />
                           <div>
-                            <div className="text-sm font-medium text-gray-900">Completed</div>
+                            <div className="text-xs sm:text-sm font-medium text-gray-900">Completed</div>
                             <div className="text-xs text-gray-500">Successfully processed</div>
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-sm font-semibold text-gray-900">{analytics.completedOrders}</div>
+                          <div className="text-xs sm:text-sm font-semibold text-gray-900">{analytics.completedOrders}</div>
                           <div className="text-xs text-gray-500">{analytics.conversionRate.toFixed(1)}%</div>
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                      <div className="flex items-center justify-between p-2 sm:p-3 bg-yellow-50 rounded-lg">
                         <div className="flex items-center">
-                          <div className="w-3 h-3 bg-yellow-500 rounded-full mr-3" />
+                          <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-yellow-500 rounded-full mr-2 sm:mr-3" />
                           <div>
-                            <div className="text-sm font-medium text-gray-900">Pending</div>
+                            <div className="text-xs sm:text-sm font-medium text-gray-900">Pending</div>
                             <div className="text-xs text-gray-500">Awaiting processing</div>
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-sm font-semibold text-gray-900">{analytics.pendingOrders}</div>
+                          <div className="text-xs sm:text-sm font-semibold text-gray-900">{analytics.pendingOrders}</div>
                           <div className="text-xs text-gray-500">₹{analytics.pendingRevenue.toLocaleString('en-IN')}</div>
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                      <div className="flex items-center justify-between p-2 sm:p-3 bg-red-50 rounded-lg">
                         <div className="flex items-center">
-                          <div className="w-3 h-3 bg-red-500 rounded-full mr-3" />
+                          <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-red-500 rounded-full mr-2 sm:mr-3" />
                           <div>
-                            <div className="text-sm font-medium text-gray-900">Cancelled</div>
+                            <div className="text-xs sm:text-sm font-medium text-gray-900">Cancelled</div>
                             <div className="text-xs text-gray-500">Order cancelled</div>
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-sm font-semibold text-gray-900">{analytics.cancelledOrders}</div>
+                          <div className="text-xs sm:text-sm font-semibold text-gray-900">{analytics.cancelledOrders}</div>
                           <div className="text-xs text-gray-500">{analytics.cancellationRate.toFixed(1)}%</div>
                         </div>
                       </div>
@@ -587,31 +589,31 @@ const Sales = () => {
                 </div>
 
                 {/* Top Performers */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="bg-white rounded-xl shadow-sm p-6">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
-                      <Award size={20} className="mr-2 text-purple-600" />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                  <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+                    <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6 flex items-center">
+                      <Award size={18} className="mr-2 text-purple-600" />
                       Top Products by Revenue
                     </h2>
                     <div className="overflow-x-auto">
                       <table className="w-full">
                         <thead className="bg-gray-50">
                           <tr>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Orders</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Revenue</th>
+                            <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
+                            <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Orders</th>
+                            <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Revenue</th>
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
                           {analytics.topProducts.map((product, index) => (
                             <tr key={index} className="hover:bg-gray-50">
-                              <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                              <td className="px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900 truncate max-w-[100px] sm:max-w-none">
                                 {product.product}
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                              <td className="px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap text-xs sm:text-sm text-gray-900">
                                 {product.count}
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                              <td className="px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900">
                                 ₹{product.revenue.toLocaleString('en-IN')}
                               </td>
                             </tr>
@@ -621,30 +623,30 @@ const Sales = () => {
                     </div>
                   </div>
 
-                  <div className="bg-white rounded-xl shadow-sm p-6">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
-                      <Star size={20} className="mr-2 text-yellow-600" />
+                  <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+                    <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6 flex items-center">
+                      <Star size={18} className="mr-2 text-yellow-600" />
                       Top Customers by Revenue
                     </h2>
                     <div className="overflow-x-auto">
                       <table className="w-full">
                         <thead className="bg-gray-50">
                           <tr>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Orders</th>
-                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Revenue</th>
+                            <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+                            <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Orders</th>
+                            <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Revenue</th>
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
                           {analytics.topCustomers.map((customer, index) => (
                             <tr key={index} className="hover:bg-gray-50">
-                              <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                              <td className="px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900 truncate max-w-[100px] sm:max-w-none">
                                 {customer.customer}
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                              <td className="px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap text-xs sm:text-sm text-gray-900">
                                 {customer.count}
                               </td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                              <td className="px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900">
                                 ₹{customer.revenue.toLocaleString('en-IN')}
                               </td>
                             </tr>
@@ -656,29 +658,29 @@ const Sales = () => {
                 </div>
 
                 {/* Performance Insights */}
-                <div className="bg-white rounded-xl shadow-sm p-6">
-                  <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
-                    <AlertCircle size={20} className="mr-2 text-blue-600" />
+                <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+                  <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6 flex items-center">
+                    <AlertCircle size={18} className="mr-2 text-blue-600" />
                     Performance Insights
                   </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-blue-50 p-4 rounded-lg">
-                      <h3 className="text-sm font-medium text-blue-900 mb-2">Revenue Growth</h3>
-                      <div className="text-2xl font-bold text-blue-600">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                    <div className="bg-blue-50 p-3 sm:p-4 rounded-lg">
+                      <h3 className="text-xs sm:text-sm font-medium text-blue-900 mb-2">Revenue Growth</h3>
+                      <div className="text-lg sm:text-2xl font-bold text-blue-600">
                         {analytics.monthOverMonthGrowth >= 0 ? '+' : ''}{analytics.monthOverMonthGrowth.toFixed(1)}%
                       </div>
                       <p className="text-xs text-blue-700 mt-1">Month over Month</p>
                     </div>
-                    <div className="bg-green-50 p-4 rounded-lg">
-                      <h3 className="text-sm font-medium text-green-900 mb-2">Conversion Rate</h3>
-                      <div className="text-2xl font-bold text-green-600">
+                    <div className="bg-green-50 p-3 sm:p-4 rounded-lg">
+                      <h3 className="text-xs sm:text-sm font-medium text-green-900 mb-2">Conversion Rate</h3>
+                      <div className="text-lg sm:text-2xl font-bold text-green-600">
                         {analytics.conversionRate.toFixed(1)}%
                       </div>
                       <p className="text-xs text-green-700 mt-1">Order Completion</p>
                     </div>
-                    <div className="bg-purple-50 p-4 rounded-lg">
-                      <h3 className="text-sm font-medium text-purple-900 mb-2">Average Order</h3>
-                      <div className="text-2xl font-bold text-purple-600">
+                    <div className="bg-purple-50 p-3 sm:p-4 rounded-lg">
+                      <h3 className="text-xs sm:text-sm font-medium text-purple-900 mb-2">Average Order</h3>
+                      <div className="text-lg sm:text-2xl font-bold text-purple-600">
                         ₹{Math.round(analytics.averageOrderValue).toLocaleString('en-IN')}
                       </div>
                       <p className="text-xs text-purple-700 mt-1">Per Order Value</p>
@@ -692,14 +694,14 @@ const Sales = () => {
       )}
 
       {showAddForm && (
-        <div className="mb-6 bg-white p-6 rounded-lg border border-gray-200">
-          <h3 className="text-lg font-medium mb-4">Add New Sale</h3>
+        <div className="mb-4 sm:mb-6 bg-white p-4 sm:p-6 rounded-lg border border-gray-200">
+          <h3 className="text-base sm:text-lg font-medium mb-3 sm:mb-4">Add New Sale</h3>
           
           {/* Customer Selection Dropdown */}
-          <div className="mb-6 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-4 shadow-sm">
+          <div className="mb-4 sm:mb-6 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-3 sm:p-4 shadow-sm">
             <div className="flex items-center mb-3">
-              <div className="bg-purple-600 p-2 rounded-lg mr-3">
-                <UserPlus size={18} className="text-white" />
+              <div className="bg-purple-600 p-1.5 sm:p-2 rounded-lg mr-2 sm:mr-3">
+                <UserPlus size={14} className="text-white" />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-purple-900">
@@ -715,7 +717,7 @@ const Sales = () => {
                     autoFillFromExistingCustomer(e.target.value)
                   }
                 }}
-                className="w-full px-4 py-3 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-sm font-medium appearance-none cursor-pointer hover:border-purple-400 transition-colors"
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-sm font-medium appearance-none cursor-pointer hover:border-purple-400 transition-colors"
               >
                 <option value="">👤 Choose existing customer to auto-fill...</option>
                 {getAllCustomersFromStorage().map((customer, index) => (
@@ -725,7 +727,7 @@ const Sales = () => {
                 ))}
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
@@ -736,7 +738,7 @@ const Sales = () => {
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Customer</label>
               <input
@@ -744,7 +746,7 @@ const Sales = () => {
                 required
                 value={formData.customer}
                 onChange={(e) => setFormData({...formData, customer: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
                 placeholder="Customer name"
               />
             </div>
@@ -754,7 +756,7 @@ const Sales = () => {
                 <select
                   value={formData.location || ''}
                   onChange={(e) => setFormData({...formData, location: e.target.value})}
-                  className="w-full px-4 py-3 pr-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-purple-400 transition-colors duration-200"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 pr-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-purple-400 transition-colors duration-200 text-sm"
                 >
                   <option value="">📍 Select a state...</option>
                   {indianStates.map((state, index) => (
@@ -764,7 +766,7 @@ const Sales = () => {
                   ))}
                 </select>
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 9l6 6m0 0l6-6" />
                   </svg>
                 </div>
@@ -784,11 +786,11 @@ const Sales = () => {
                         setShowProductSuggestions(true);
                       }
                     }}
-                    className="w-full px-4 py-3 pr-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-gray-900 font-medium hover:border-green-400 transition-colors duration-200"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 pr-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-gray-900 font-medium hover:border-green-400 transition-colors duration-200 text-sm"
                     placeholder="Search or enter product name..."
                   />
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                    <ShoppingCart size={16} className="text-gray-400" />
+                    <ShoppingCart size={14} className="text-gray-400" />
                   </div>
                 </div>
                 
@@ -799,10 +801,10 @@ const Sales = () => {
                       <div
                         key={index}
                         onClick={() => selectProduct(product)}
-                        className="px-4 py-3 hover:bg-green-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition-colors duration-150 flex items-center justify-between"
+                        className="px-3 sm:px-4 py-2 sm:py-3 hover:bg-green-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition-colors duration-150 flex items-center justify-between text-xs sm:text-sm"
                       >
-                        <span className="text-gray-900 font-medium">{product}</span>
-                        <ShoppingCart size={14} className="text-gray-400" />
+                        <span className="text-gray-900 font-medium truncate max-w-[150px] sm:max-w-none">{product}</span>
+                        <ShoppingCart size={12} className="text-gray-400" />
                       </div>
                     ))}
                   </div>
@@ -811,7 +813,7 @@ const Sales = () => {
                 {/* No Results Message */}
                 {showProductSuggestions && productSuggestions.length === 0 && formData.product.length > 0 && (
                   <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg">
-                    <div className="px-4 py-3 text-gray-500 text-center">
+                    <div className="px-3 sm:px-4 py-2 sm:py-3 text-gray-500 text-center text-xs sm:text-sm">
                       No products found. Type to add new product.
                     </div>
                   </div>
@@ -822,7 +824,7 @@ const Sales = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <IndianRupee size={16} className="text-gray-400" />
+                  <IndianRupee size={14} className="text-gray-400" />
                 </div>
                 <input
                   type="text"
@@ -836,14 +838,14 @@ const Sales = () => {
                     const parsed = parseIndianCurrency(e.target.value);
                     setFormData({...formData, amount: parsed.toString()});
                   }}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full pl-9 sm:pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
                   placeholder="0"
                 />
               </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-4 gap-1 sm:gap-2">
                 <div>
                   <select
                     value={new Date(formData.date).getMonth() + 1}
@@ -854,7 +856,7 @@ const Sales = () => {
                       const newDate = new Date(year, month - 1, day).toISOString().split('T')[0]
                       setFormData({...formData, date: newDate})
                     }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-purple-400 transition-colors duration-200"
+                    className="w-full px-2 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-purple-400 transition-colors duration-200 text-xs sm:text-sm"
                   >
                     <option value="">Month</option>
                     {months.map((month, index) => (
@@ -874,7 +876,7 @@ const Sales = () => {
                       const newDate = new Date(year, month - 1, day).toISOString().split('T')[0]
                       setFormData({...formData, date: newDate})
                     }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-purple-400 transition-colors duration-200"
+                    className="w-full px-2 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-purple-400 transition-colors duration-200 text-xs sm:text-sm"
                   >
                     <option value="">Day</option>
                     {days.map((day, index) => (
@@ -894,7 +896,7 @@ const Sales = () => {
                       const newDate = new Date(year, month - 1, day).toISOString().split('T')[0]
                       setFormData({...formData, date: newDate})
                     }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-purple-400 transition-colors duration-200"
+                    className="w-full px-2 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-purple-400 transition-colors duration-200 text-xs sm:text-sm"
                   >
                     <option value="">Year</option>
                     {years.map((year, index) => (
@@ -912,21 +914,21 @@ const Sales = () => {
                 <select
                   value={formData.status}
                   onChange={(e) => setFormData({...formData, status: e.target.value})}
-                  className="w-full px-4 py-3 pr-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-green-400 transition-colors duration-200"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 pr-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-gray-900 font-medium appearance-none cursor-pointer hover:border-green-400 transition-colors duration-200 text-sm"
                 >
                   <option value="Completed" className="text-green-700">✅ Completed</option>
                   <option value="Pending" className="text-yellow-700">⏳ Pending</option>
                   <option value="Cancelled" className="text-red-700">❌ Cancelled</option>
                 </select>
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                  <Activity size={16} className="text-gray-400" />
+                  <Activity size={14} className="text-gray-400" />
                 </div>
               </div>
             </div>
             <div className="md:col-span-2">
               <button
                 type="submit"
-                className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
+                className="px-3 sm:px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 text-sm sm:text-base"
               >
                 Add Sale
               </button>
@@ -935,32 +937,32 @@ const Sales = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
         {stats.map((stat, index) => {
           const Icon = stat.icon
           return (
-            <div key={index} className="bg-white rounded-xl shadow-sm p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className={`${stat.color} p-3 rounded-lg`}>
-                  <Icon className="text-white" size={24} />
+            <div key={index} className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <div className={`${stat.color} p-2 sm:p-3 rounded-lg`}>
+                  <Icon className="text-white" size={18} />
                 </div>
-                <div className="flex items-center text-sm text-green-600">
-                  <TrendingUp size={16} className="mr-1" />
+                <div className="flex items-center text-xs sm:text-sm text-green-600">
+                  <TrendingUp size={14} className="mr-1" />
                   {stat.change}
                 </div>
               </div>
-              <h3 className="text-2xl font-bold text-gray-800">{stat.value}</h3>
-              <p className="text-gray-600 text-sm mt-1">{stat.title}</p>
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-800">{stat.value}</h3>
+              <p className="text-gray-600 text-xs sm:text-sm mt-1">{stat.title}</p>
             </div>
           )
         })}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-gray-800">Revenue Overview</h2>
-            <select className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800">Revenue Overview</h2>
+            <select className="px-2 sm:px-3 py-1 border border-gray-300 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary-500">
               <option>Last 6 months</option>
               <option>Last year</option>
               <option>All time</option>
@@ -969,36 +971,36 @@ const Sales = () => {
           <SalesChart />
         </div>
         
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Top Products</h2>
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4">Top Products</h2>
           <TopProducts />
         </div>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800">Recent Sales</h2>
+        <div className="p-4 sm:p-6 border-b border-gray-200">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-800">Recent Sales</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Customer
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Product
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Amount
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Date
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -1006,71 +1008,71 @@ const Sales = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {sales.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center">
+                  <td colSpan="6" className="px-3 sm:px-6 py-8 sm:py-12 text-center">
                     <div className="text-gray-500">
-                      <ShoppingCart className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                      <p>No sales found</p>
-                      <p className="text-sm mt-1">Add your first sale to get started</p>
+                      <ShoppingCart className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4 text-gray-300" />
+                      <p className="text-sm sm:text-base">No sales found</p>
+                      <p className="text-xs sm:text-sm mt-1">Add your first sale to get started</p>
                     </div>
                   </td>
                 </tr>
               ) : (
                 sales.map((sale) => (
                   <tr key={sale.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900">
                       {editingSale === sale.id ? (
                         <input
                           type="text"
                           value={formData.customer}
                           onChange={(e) => setFormData({...formData, customer: e.target.value})}
-                          className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent text-xs sm:text-sm"
                         />
                       ) : (
-                        sale.customer
+                        <span className="truncate max-w-[100px] sm:max-w-none">{sale.customer}</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
                       {editingSale === sale.id ? (
                         <input
                           type="text"
                           value={formData.product}
                           onChange={(e) => setFormData({...formData, product: e.target.value})}
-                          className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent text-xs sm:text-sm"
                         />
                       ) : (
-                        sale.product
+                        <span className="truncate max-w-[100px] sm:max-w-none">{sale.product}</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
                       {editingSale === sale.id ? (
                         <input
                           type="number"
                           value={formData.amount}
                           onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                          className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent text-xs sm:text-sm"
                         />
                       ) : (
                         formatIndianCurrency(sale.amount)
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                       {editingSale === sale.id ? (
                         <input
                           type="date"
                           value={formData.date}
                           onChange={(e) => setFormData({...formData, date: e.target.value})}
-                          className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent text-xs sm:text-sm"
                         />
                       ) : (
                         sale.date
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                       {editingSale === sale.id ? (
                         <select
                           value={formData.status}
                           onChange={(e) => setFormData({...formData, status: e.target.value})}
-                          className="px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          className="px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent text-xs sm:text-sm"
                         >
                           <option value="Completed">Completed</option>
                           <option value="Pending">Pending</option>
@@ -1088,35 +1090,35 @@ const Sales = () => {
                         </span>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                       {editingSale === sale.id ? (
-                        <div className="flex space-x-2">
+                        <div className="flex space-x-1 sm:space-x-2">
                           <button 
                             onClick={() => handleUpdate(sale.id)}
                             className="text-green-600 hover:text-green-900"
                           >
-                            <Save size={16} />
+                            <Save size={14} />
                           </button>
                           <button 
                             onClick={cancelEdit}
                             className="text-gray-600 hover:text-gray-900"
                           >
-                            <X size={16} />
+                            <X size={14} />
                           </button>
                         </div>
                       ) : (
-                        <div className="flex space-x-2">
+                        <div className="flex space-x-1 sm:space-x-2">
                           <button 
                             onClick={() => handleEdit(sale)}
                             className="text-blue-600 hover:text-blue-900"
                           >
-                            <Edit2 size={16} />
+                            <Edit2 size={14} />
                           </button>
                           <button 
                             onClick={() => handleDelete(sale.id)}
                             className="text-red-600 hover:text-red-900"
                           >
-                            Delete
+                            <X size={14} />
                           </button>
                         </div>
                       )}
@@ -1131,28 +1133,28 @@ const Sales = () => {
 
       {/* Pending Orders Section */}
       {pendingSales.length > 0 && (
-        <div className="mt-8 bg-white rounded-xl shadow-sm">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-800">Pending Orders</h2>
-            <p className="text-sm text-gray-600 mt-1">Orders awaiting completion</p>
+        <div className="mt-6 sm:mt-8 bg-white rounded-xl shadow-sm">
+          <div className="p-4 sm:p-6 border-b border-gray-200">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800">Pending Orders</h2>
+            <p className="text-xs sm:text-sm text-gray-600 mt-1">Orders awaiting completion</p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Customer
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Product
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Amount
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Date
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -1160,31 +1162,31 @@ const Sales = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {pendingSales.map((sale) => (
                   <tr key={sale.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {sale.customer}
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900">
+                      <span className="truncate max-w-[100px] sm:max-w-none">{sale.customer}</span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {sale.product}
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
+                      <span className="truncate max-w-[100px] sm:max-w-none">{sale.product}</span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
                       {formatIndianCurrency(sale.amount)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                       {sale.date}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <div className="flex space-x-2">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
+                      <div className="flex space-x-1 sm:space-x-2">
                         <button 
                           onClick={() => handleEdit(sale)}
                           className="text-blue-600 hover:text-blue-900"
                         >
-                          <Edit2 size={16} />
+                          <Edit2 size={14} />
                         </button>
                         <button 
                           onClick={() => handleDelete(sale.id)}
                           className="text-red-600 hover:text-red-900"
                         >
-                          Delete
+                          <X size={14} />
                         </button>
                       </div>
                     </td>
