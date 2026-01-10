@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { Plus, Search, Clock, User, CheckCircle, Circle, AlertCircle, Edit2, Trash2, BarChart3, Layout, TrendingUp, Users, Target, Activity, AlertTriangle, Calendar } from 'lucide-react'
+import React, { useState, useEffect, useRef } from 'react'
+import { Plus, Search, Clock, User, CheckCircle, Circle, AlertCircle, Edit2, Trash2, BarChart3, Layout, TrendingUp, Users, Target, Activity, AlertTriangle, Calendar, GripVertical } from 'lucide-react'
 import { taskService } from '../services/taskService.js'
 
 const Tasks = () => {
@@ -12,6 +12,9 @@ const Tasks = () => {
   const [showEditForm, setShowEditForm] = useState(false)
   const [selectedTask, setSelectedTask] = useState(null)
   const [viewMode, setViewMode] = useState('list') // list, kanban, analytics
+  const [draggedTask, setDraggedTask] = useState(null)
+  const [dragOverStatus, setDragOverStatus] = useState(null)
+  const dragCounter = useRef(0)
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -163,6 +166,75 @@ const Tasks = () => {
       ))
     } catch (error) {
       console.error('Error updating task:', error)
+    }
+  }
+
+  // Drag and Drop Handlers
+  const handleDragStart = (e, task) => {
+    setDraggedTask(task)
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/html', e.target.innerHTML)
+    
+    // Add dragging styles
+    e.target.style.opacity = '0.5'
+    e.target.style.transform = 'rotate(5deg)'
+  }
+
+  const handleDragEnd = (e) => {
+    // Reset dragging styles
+    e.target.style.opacity = '1'
+    e.target.style.transform = 'rotate(0deg)'
+    setDraggedTask(null)
+    setDragOverStatus(null)
+  }
+
+  const handleDragOver = (e, status) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    
+    if (dragOverStatus !== status) {
+      setDragOverStatus(status)
+    }
+  }
+
+  const handleDragEnter = (e, status) => {
+    e.preventDefault()
+    dragCounter.current++
+    setDragOverStatus(status)
+  }
+
+  const handleDragLeave = (e) => {
+    e.preventDefault()
+    dragCounter.current--
+    
+    if (dragCounter.current === 0) {
+      setDragOverStatus(null)
+    }
+  }
+
+  const handleDrop = async (e, newStatus) => {
+    e.preventDefault()
+    dragCounter.current = 0
+    setDragOverStatus(null)
+    
+    if (!draggedTask || draggedTask.status === newStatus) {
+      return
+    }
+
+    try {
+      // Update task status in database
+      await taskService.updateTask(draggedTask.id, { status: newStatus })
+      
+      // Update local state
+      setTasks(prevTasks => 
+        prevTasks.map(task => 
+          task.id === draggedTask.id ? { ...task, status: newStatus } : task
+        )
+      )
+      
+      setDraggedTask(null)
+    } catch (error) {
+      console.error('Error updating task status:', error)
     }
   }
 
@@ -407,7 +479,16 @@ const Tasks = () => {
       {viewMode === 'kanban' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {Object.entries(kanbanTasks).map(([status, statusTasks]) => (
-            <div key={status} className="bg-white rounded-xl shadow-sm">
+            <div 
+              key={status} 
+              className={`bg-white rounded-xl shadow-sm transition-all duration-200 ${
+                dragOverStatus === status ? 'ring-2 ring-blue-400 ring-opacity-50 scale-[1.02]' : ''
+              }`}
+              onDragOver={(e) => handleDragOver(e, status)}
+              onDragEnter={(e) => handleDragEnter(e, status)}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, status)}
+            >
               <div className="p-4 border-b border-gray-200">
                 <h3 className="font-semibold capitalize flex items-center gap-2">
                   {getStatusIcon(status)}
@@ -415,38 +496,58 @@ const Tasks = () => {
                 </h3>
               </div>
               <div className="p-4 space-y-3 min-h-[400px]">
-                {statusTasks.map(task => (
-                  <div
-                    key={task.id}
-                    className="bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-                    onClick={() => handleEdit(task)}
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <h4 className="font-medium text-gray-900">{task.title}</h4>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleDelete(task.id)
-                        }}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">{task.description}</p>
-                    <div className="flex items-center justify-between">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(task.priority)}`}>
-                        {task.priority}
-                      </span>
-                      {task.dueDate && (
-                        <div className="flex items-center text-xs text-gray-500">
-                          <Calendar size={12} className="mr-1" />
-                          {new Date(task.dueDate).toLocaleDateString()}
-                        </div>
-                      )}
+                {statusTasks.length === 0 ? (
+                  <div className="text-center py-8 text-gray-400">
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                        {getStatusIcon(status)}
+                      </div>
+                      <p className="text-sm">No tasks in {status.replace('-', ' ')}</p>
+                      <p className="text-xs">Drag tasks here</p>
                     </div>
                   </div>
-                ))}
+                ) : (
+                  statusTasks.map(task => (
+                    <div
+                      key={task.id}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, task)}
+                      onDragEnd={handleDragEnd}
+                      className={`bg-gray-50 rounded-lg p-4 hover:shadow-md transition-all duration-200 cursor-move border-2 border-transparent hover:border-gray-300 ${
+                        draggedTask?.id === task.id ? 'opacity-50 rotate-2' : ''
+                      }`}
+                      onClick={() => handleEdit(task)}
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <GripVertical size={14} className="text-gray-400" />
+                          <h4 className="font-medium text-gray-900">{task.title}</h4>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleDelete(task.id)
+                          }}
+                          className="text-red-600 hover:text-red-900 opacity-0 hover:opacity-100 transition-opacity"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-3 line-clamp-2">{task.description}</p>
+                      <div className="flex items-center justify-between">
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(task.priority)}`}>
+                          {task.priority}
+                        </span>
+                        {task.dueDate && (
+                          <div className="flex items-center text-xs text-gray-500">
+                            <Calendar size={12} className="mr-1" />
+                            {new Date(task.dueDate).toLocaleDateString()}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           ))}
