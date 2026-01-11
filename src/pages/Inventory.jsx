@@ -678,52 +678,53 @@ const Inventory = () => {
       </div>
 
       {/* Dream Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg shadow p-6 text-white">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+        <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg shadow p-4 text-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-white/80">Total Dreams</p>
-              <p className="text-2xl font-bold">{inventory.length}</p>
+              <p className="text-xs font-medium text-white/80">Total Dreams</p>
+              <p className="text-lg font-bold">{inventory.length}</p>
             </div>
-            <Brain className="h-8 w-8 text-white/80" />
+            <Brain className="h-6 w-6 text-white/80" />
           </div>
         </div>
         
-        <div className="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg shadow p-6 text-white">
+        <div className="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg shadow p-4 text-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-white/80">Dream Value</p>
-              <p className="text-2xl font-bold">{formatCurrency(calculateDreamValue())}</p>
+              <p className="text-xs font-medium text-white/80">Dream Value</p>
+              <p className="text-lg font-bold">{formatCurrency(calculateDreamValue())}</p>
             </div>
-            <Diamond className="h-8 w-8 text-white/80" />
+            <Diamond className="h-6 w-6 text-white/80" />
           </div>
         </div>
         
-        <div className="bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg shadow p-6 text-white">
+        <div className="bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg shadow p-4 text-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-white/80">Potential Profit</p>
-              <p className="text-2xl font-bold">{formatCurrency(calculatePotentialProfit())}</p>
+              <p className="text-xs font-medium text-white/80">Potential Profit</p>
+              <p className="text-lg font-bold">{formatCurrency(calculatePotentialProfit())}</p>
             </div>
-            <Rocket className="h-8 w-8 text-white/80" />
+            <Rocket className="h-6 w-6 text-white/80" />
           </div>
         </div>
         
-        <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-lg shadow p-6 text-white">
+        <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-lg shadow p-4 text-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-white/80">Active Dreams</p>
-              <p className="text-2xl font-bold">{getActiveDreams()}</p>
+              <p className="text-xs font-medium text-white/80">Active Dreams</p>
+              <p className="text-lg font-bold">{getActiveDreams()}</p>
             </div>
-            <Zap className="h-8 w-8 text-white/80" />
+            <Zap className="h-6 w-6 text-white/80" />
           </div>
         </div>
       </div>
 
       {/* Dream Actions Bar */}
       <div className="bg-white rounded-lg shadow mb-6 p-4">
-        <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
-          <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
+        <div className="space-y-4">
+          {/* Search and Filters */}
+          <div className="flex flex-col gap-2">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <input
@@ -731,54 +732,57 @@ const Inventory = () => {
                 placeholder="Search dreams, inspiration, tags..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent w-full sm:w-64"
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent w-full"
               />
             </div>
             
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            >
-              <option value="all">All Dreams</option>
-              {dreamStatuses.map(status => (
-                <option key={status} value={status}>{status.charAt(0).toUpperCase() + status.slice(1)}</option>
-              ))}
-            </select>
-            
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            >
-              <option value="inspiration">Sort by Dream Value</option>
-              <option value="profit">Sort by Profit</option>
-              <option value="priority">Sort by Priority</option>
-              <option value="name">Sort by Name</option>
-            </select>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+              >
+                <option value="all">All Dreams</option>
+                {dreamStatuses.map(status => (
+                  <option key={status} value={status}>{status.charAt(0).toUpperCase() + status.slice(1)}</option>
+                ))}
+              </select>
+              
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+              >
+                <option value="inspiration">Sort by Dream Value</option>
+                <option value="profit">Sort by Profit</option>
+                <option value="priority">Sort by Priority</option>
+                <option value="name">Sort by Name</option>
+              </select>
+            </div>
           </div>
           
-          <div className="flex gap-2">
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-2">
             <button
               onClick={() => setShowQuickCapture(true)}
-              className="px-4 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-lg hover:from-yellow-500 hover:to-orange-600 transition-all flex items-center gap-2 shadow-md"
+              className="flex-1 px-3 py-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-lg hover:from-yellow-500 hover:to-orange-600 transition-all flex items-center justify-center gap-2 shadow-md text-sm"
             >
-              <Lightbulb size={16} />
+              <Lightbulb size={14} />
               Quick Idea
             </button>
             
             <button
               onClick={() => setViewMode(viewMode === 'list' ? 'grid' : 'list')}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm"
             >
               {viewMode === 'list' ? 'List View' : 'Grid View'}
             </button>
             
             <button
               onClick={() => setShowAddModal(true)}
-              className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all flex items-center gap-2 shadow-md"
+              className="flex-1 px-3 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all flex items-center justify-center gap-2 shadow-md text-sm"
             >
-              <Plus size={16} />
+              <Plus size={14} />
               Add Dream
             </button>
           </div>
@@ -1141,7 +1145,7 @@ const Inventory = () => {
             } else {
               // Grid view
               return (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {filteredInventory.map(item => {
                     const dreamStatus = getDreamStatus(item)
                     const StatusIcon = dreamStatus.icon
@@ -1304,7 +1308,7 @@ const Inventory = () => {
       {/* Add/Edit Modal */}
       {(showAddModal || showEditModal) && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl max-w-5xl w-full max-h-[95vh] overflow-hidden shadow-2xl">
+          <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[95vh] overflow-hidden shadow-2xl">
             {/* Header with gradient */}
             <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 p-6 text-white">
               <div className="flex items-center justify-between">
@@ -1364,7 +1368,7 @@ const Inventory = () => {
                     </div>
                     <h3 className="text-xl font-bold text-gray-800">Basic Information</h3>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 gap-4">
                     <div className="space-y-2">
                       <label className="block text-sm font-semibold text-gray-700 flex items-center gap-1">
                         Dream Name <span className="text-red-500">*</span>
@@ -1448,7 +1452,7 @@ const Inventory = () => {
                     </div>
                     <h3 className="text-xl font-bold text-gray-800">Dream Details</h3>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 gap-4">
                     <div className="space-y-2">
                       <label className="block text-sm font-semibold text-gray-700 flex items-center gap-1">
                         <Lightbulb size={16} className="text-yellow-500" />
@@ -1611,7 +1615,7 @@ const Inventory = () => {
                     </div>
                     <h3 className="text-xl font-bold text-gray-800">Market Analysis</h3>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 gap-4">
                     <div className="space-y-2">
                       <label className="block text-sm font-semibold text-gray-700">Target Market</label>
                       <input
@@ -1657,7 +1661,7 @@ const Inventory = () => {
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                  <div className="grid grid-cols-1 gap-4 mt-6">
                     <div className="space-y-2">
                       <label className="block text-sm font-semibold text-gray-700">Market Size</label>
                       <input
@@ -1703,7 +1707,7 @@ const Inventory = () => {
                     </div>
                     <h3 className="text-xl font-bold text-gray-800">Business Strategy</h3>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 gap-4">
                     <div className="space-y-2">
                       <label className="block text-sm font-semibold text-gray-700">Pricing Strategy</label>
                       <select
@@ -1752,7 +1756,7 @@ const Inventory = () => {
                     </div>
                     <h3 className="text-xl font-bold text-gray-800">Development Planning</h3>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 gap-4">
                     <div className="space-y-2">
                       <label className="block text-sm font-semibold text-gray-700">Development Stages</label>
                       <select
@@ -1782,7 +1786,7 @@ const Inventory = () => {
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                  <div className="grid grid-cols-1 gap-4 mt-6">
                     <div className="space-y-2">
                       <label className="block text-sm font-semibold text-gray-700">Technology Requirements</label>
                       <textarea
@@ -1815,7 +1819,7 @@ const Inventory = () => {
                     </div>
                     <h3 className="text-xl font-bold text-gray-800">Financial Planning</h3>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 gap-4">
                     <div className="space-y-2">
                       <label className="block text-sm font-semibold text-gray-700">Budget Needed (₹)</label>
                       <input
@@ -1851,7 +1855,7 @@ const Inventory = () => {
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                  <div className="grid grid-cols-1 gap-4 mt-6">
                     <div className="space-y-2">
                       <label className="block text-sm font-semibold text-gray-700">Expected Launch Date</label>
                       <input
@@ -1883,7 +1887,7 @@ const Inventory = () => {
                     </div>
                     <h3 className="text-xl font-bold text-gray-800">Risk Assessment</h3>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 gap-4">
                     <div className="space-y-2">
                       <label className="block text-sm font-semibold text-gray-700">Risks</label>
                       <textarea
@@ -1916,7 +1920,7 @@ const Inventory = () => {
                     </div>
                     <h3 className="text-xl font-bold text-gray-800">Growth & Sustainability</h3>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 gap-4">
                     <div className="space-y-2">
                       <label className="block text-sm font-semibold text-gray-700">Scalability</label>
                       <textarea
@@ -1949,7 +1953,7 @@ const Inventory = () => {
                     </div>
                     <h3 className="text-xl font-bold text-gray-800">Launch & Support Planning</h3>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 gap-4">
                     <div className="space-y-2">
                       <label className="block text-sm font-semibold text-gray-700">Partnerships</label>
                       <input
@@ -1973,7 +1977,7 @@ const Inventory = () => {
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                  <div className="grid grid-cols-1 gap-4 mt-6">
                     <div className="space-y-2">
                       <label className="block text-sm font-semibold text-gray-700">Quality Standards</label>
                       <textarea
@@ -2006,7 +2010,7 @@ const Inventory = () => {
                     </div>
                     <h3 className="text-xl font-bold text-gray-800">Testing & Launch Strategy</h3>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 gap-4">
                     <div className="space-y-2">
                       <label className="block text-sm font-semibold text-gray-700">Testing Plan</label>
                       <textarea
@@ -2081,7 +2085,7 @@ const Inventory = () => {
                     </div>
                     <h3 className="text-xl font-bold text-gray-800">Business Details</h3>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 gap-4">
                     <div className="space-y-2">
                       <label className="block text-sm font-semibold text-gray-700">Unit Price (₹)</label>
                       <input
