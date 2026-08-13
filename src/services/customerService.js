@@ -4,7 +4,66 @@ const STORAGE_KEY = 'crm_customers'
 const getStoredCustomers = () => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY)
-    return stored ? JSON.parse(stored) : []
+    if (stored) {
+      return JSON.parse(stored)
+    }
+    // Initialize with demo data if empty
+    const demoCustomers = [
+      {
+        id: '1',
+        name: 'John Smith',
+        email: 'john@techcorp.com',
+        phone: '+91 98765 43210',
+        company: 'Tech Corp',
+        status: 'active',
+        total_purchases: 5,
+        total_spent: '250000',
+        last_purchase: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+        created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+        updated_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        id: '2',
+        name: 'Sarah Johnson',
+        email: 'sarah@digitalsolutions.com',
+        phone: '+91 87654 32109',
+        company: 'Digital Solutions',
+        status: 'active',
+        total_purchases: 3,
+        total_spent: '180000',
+        last_purchase: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+        created_at: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
+        updated_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        id: '3',
+        name: 'Emily Davis',
+        email: 'emily@enterprise.co',
+        phone: '+91 65432 10987',
+        company: 'Enterprise Co',
+        status: 'active',
+        total_purchases: 8,
+        total_spent: '450000',
+        last_purchase: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+        created_at: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
+        updated_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        id: '4',
+        name: 'Michael Brown',
+        email: 'michael@startupinc.com',
+        phone: '+91 76543 21098',
+        company: 'Startup Inc',
+        status: 'inactive',
+        total_purchases: 2,
+        total_spent: '75000',
+        last_purchase: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
+        created_at: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
+        updated_at: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString()
+      }
+    ]
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(demoCustomers))
+    return demoCustomers
   } catch (error) {
     console.error('Error loading customers from localStorage:', error)
     return []

@@ -8,16 +8,13 @@ import {
   CheckSquare,
   Menu,
   X,
-  LogOut,
   Package,
   Warehouse
 } from 'lucide-react'
 import { useState } from 'react'
-import { useAuth } from '../contexts/AuthContext.jsx'
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false)
-  const { user, logout } = useAuth()
 
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/' },
@@ -29,13 +26,6 @@ const Sidebar = () => {
     { name: 'Tasks', icon: CheckSquare, path: '/tasks' },
   ]
 
-  const handleLogout = async () => {
-    try {
-      await logout()
-    } catch (error) {
-      console.error('Logout failed:', error)
-    }
-  }
 
   return (
     <>
@@ -75,29 +65,8 @@ const Sidebar = () => {
             )
           })}
         </nav>
-        
-        <div className="absolute bottom-0 left-0 right-0 p-6">
-          <div className="bg-gray-100 rounded-lg p-4 mb-3">
-            <div className="flex items-center">
-              <div className="w-10 h-10 bg-primary-600 rounded-full flex items-center justify-center text-white font-semibold">
-                {user?.email?.charAt(0).toUpperCase() || 'U'}
-              </div>
-              <div className="ml-3 flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-800 truncate" title={user?.email || 'User'}>
-                  {user?.email || 'User'}
-                </p>
-                <p className="text-xs text-gray-500">Business Owner</p>
-              </div>
-            </div>
-          </div>
-          
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center justify-center px-4 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
-          >
-            <LogOut size={16} className="mr-2" />
-            Logout
-          </button>
+        <div className="absolute bottom-4 left-0 right-0 px-6 text-xs text-gray-400 text-center">
+          Built by <a href="https://www.curiouskaizer.com/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary-600 underline" title="Curious Kaizer - Web Development Company in Delhi">Curious Kaizer</a>
         </div>
       </div>
     </>

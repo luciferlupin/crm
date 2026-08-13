@@ -4,7 +4,74 @@ const STORAGE_KEY = 'crm_sales'
 const getStoredSales = () => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY)
-    return stored ? JSON.parse(stored) : []
+    if (stored) {
+      return JSON.parse(stored)
+    }
+    // Initialize with demo data if empty
+    const demoSales = [
+      {
+        id: '1',
+        customer: 'John Smith',
+        product: 'Enterprise License',
+        amount: '50000',
+        status: 'Completed',
+        date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+        created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+        updated_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        id: '2',
+        customer: 'Sarah Johnson',
+        product: 'Premium Package',
+        amount: '75000',
+        status: 'Completed',
+        date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+        created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+        updated_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        id: '3',
+        customer: 'Emily Davis',
+        product: 'Custom Solution',
+        amount: '200000',
+        status: 'Completed',
+        date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+        created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+        updated_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        id: '4',
+        customer: 'Michael Brown',
+        product: 'Basic Plan',
+        amount: '30000',
+        status: 'Pending',
+        date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+        created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+        updated_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        id: '5',
+        customer: 'Robert Wilson',
+        product: 'Starter Kit',
+        amount: '15000',
+        status: 'Cancelled',
+        date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+        created_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+        updated_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        id: '6',
+        customer: 'John Smith',
+        product: 'Support Contract',
+        amount: '25000',
+        status: 'Pending',
+        date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+        created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+        updated_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
+      }
+    ]
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(demoSales))
+    return demoSales
   } catch (error) {
     console.error('Error loading sales from localStorage:', error)
     return []
